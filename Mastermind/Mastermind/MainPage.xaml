@@ -3,10 +3,27 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Mastermind.MainPage">
 
-    <!-- Area for  -->
+    <!-- Area for Board -->
     <StackLayout>
-        
-        
-    </StackLayout>
+        <!-- Gameboard -->
+        <Frame x:Name="GameBoard" BackgroundColor="#d5e1df" Padding="20" CornerRadius="10">
+            <Label Text="Play Mastermind" HorizontalTextAlignment="Center" 
+                   TextColor="Black" FontSize="Medium"/>
+        </Frame>
 
+        <!--  Grid for the game board  -->
+        <Grid BackgroundColor="#C23E21" HeightRequest="600" WidthRequest="350" 
+              HorizontalOptions="Center" VerticalOptions="Center" 
+              ColumnSpacing="1" RowSpacing="0">
+
+            <Grid x:Name="GrdGameLayout" Grid.Row="0" Grid.Column="0"
+                  Grid.ColumnSpan="6" Grid.RowSpan="14"
+                  BackgroundColor="#E5694F" Margin="10" />
+
+            <Grid x:Name="GrdCorrectDisplay" Grid.Row="1" Grid.Column="4"
+                  Grid.RowSpan="14" Grid.ColumnSpan="1" />
+        </Grid>
+        
+        <!-- End of Gameboard -->
+    </StackLayout>
 </ContentPage>

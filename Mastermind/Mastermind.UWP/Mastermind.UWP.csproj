@@ -131,6 +131,16 @@
     <Content Include="Assets\Wide310x150Logo.scale-100.png" />
     <Content Include="Assets\Wide310x150Logo.scale-200.png" />
     <Content Include="Assets\Wide310x150Logo.scale-400.png" />
+    <Content Include="Images\BlackDot.png" />
+    <Content Include="Images\BlueDot.png" />
+    <Content Include="Images\Empty.png" />
+    <Content Include="Images\GreenDot.png" />
+    <Content Include="Images\OrangeDot.png" />
+    <Content Include="Images\QuestionMark.png" />
+    <Content Include="Images\RedDot.png" />
+    <Content Include="Images\TanDot.png" />
+    <Content Include="Images\WhiteDot.png" />
+    <Content Include="Images\YellowDot.png" />
     <Content Include="Properties\Default.rd.xml" />
   </ItemGroup>
   <ItemGroup>
@@ -145,7 +155,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Xamarin.Forms" Version="5.0.0.2012" />
-    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.12"/>
+    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.12" />
     <PackageReference Include="Xamarin.Essentials" Version="1.6.1" />
   </ItemGroup>
   <ItemGroup>
