@@ -148,21 +148,69 @@
                 </Grid.RowDefinitions>
                 
                 <!-- Images for Colour Pins -->
-                <Image x:Name="Red" Source="Images/RedDot.png" Grid.Column="0" Grid.Row="0">
+                <!-- Red -->
+                <Image StyleId="RedDot" Source="Images/RedDot.png" Grid.Column="0" Grid.Row="0">
                     <Image.GestureRecognizers>
                         <TapGestureRecognizer
-                            Tapped="ColourPinsTapped" NumberOfTapsRequired="1" 
-                            x:Name="RedDot"/>
+                            Tapped="ColourPinsTapped" NumberOfTapsRequired="1" />
                     </Image.GestureRecognizers>
                 </Image>
-                <Image x:Name="Green" Source="Images/GreenDot.png" Grid.Column="1" Grid.Row="0"/>
-                <Image x:Name="Blue" Source="Images/BlueDot.png" Grid.Column="2" Grid.Row="0"/>
-                <Image x:Name="Black" Source="Images/BlackDot.png" Grid.Column="3" Grid.Row="0"/>
+                
+                <!-- Green -->
+                <Image StyleId ="GreenDot" Source="Images/GreenDot.png" Grid.Column="1" Grid.Row="0">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer
+                                Tapped="ColourPinsTapped" NumberOfTapsRequired="1" />
+                    </Image.GestureRecognizers>
+                </Image>
+                
+                <!-- Blue -->
+                <Image StyleId="BlueDot" Source="Images/BlueDot.png" Grid.Column="2" Grid.Row="0">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer
+                            Tapped="ColourPinsTapped" NumberOfTapsRequired="1" />
+                    </Image.GestureRecognizers>
+                </Image>
+                
+                <!-- Black -->
+                <Image StyleId="BlackDot" Source="Images/BlackDot.png" Grid.Column="3" Grid.Row="0">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer
+                            Tapped="ColourPinsTapped" NumberOfTapsRequired="1" />
+                    </Image.GestureRecognizers>
+                </Image>
 
-                <Image x:Name="White" Source="Images/WhiteDot.png" Grid.Column="0" Grid.Row="1"/>
-                <Image x:Name="Tan" Source="Images/TanDot.png" Grid.Column="1" Grid.Row="1"/>
-                <Image x:Name="Yellow" Source="Images/YellowDot.png" Grid.Column="2" Grid.Row="1"/>
-                <Image x:Name="Orange" Source="Images/OrangeDot.png" Grid.Column="3" Grid.Row="1"/>
+                <!-- White -->
+                <Image StyleId="WhiteDot" Source="Images/WhiteDot.png" Grid.Column="0" Grid.Row="1">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer
+                            Tapped="ColourPinsTapped" NumberOfTapsRequired="1" />
+                    </Image.GestureRecognizers>
+                </Image>
+                
+                <!-- Tan -->
+                <Image StyleId="TanDot" Source="Images/TanDot.png" Grid.Column="1" Grid.Row="1">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer
+                            Tapped="ColourPinsTapped" NumberOfTapsRequired="1" />
+                    </Image.GestureRecognizers>
+                </Image>
+                
+                <!-- Yellow -->
+                <Image StyleId="YellowDot" Source="Images/YellowDot.png" Grid.Column="2" Grid.Row="1">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer
+                            Tapped="ColourPinsTapped" NumberOfTapsRequired="1" />
+                    </Image.GestureRecognizers>
+                </Image>
+                
+                <!-- Orange -->
+                <Image StyleId="OrangeDot" Source="Images/OrangeDot.png" Grid.Column="3" Grid.Row="1">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer
+                            Tapped="ColourPinsTapped" NumberOfTapsRequired="1" />
+                    </Image.GestureRecognizers>
+                </Image>
             </Grid>
 
         </Grid>

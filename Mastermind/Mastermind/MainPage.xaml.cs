@@ -14,10 +14,8 @@ namespace Mastermind
         const int NUM_ROW = 11, NUM_COL = 4; //Guess Area
         const int COR_ROW = 30, COR_COL = 2; //Correct Display
 
-        int tapCount = 0;
-
-        //Boxview for Selected Pin
-        BoxView currPinSelected;
+        Image imagePinSender;
+        int tapCount = 1;
 
         //Main
         public MainPage()
@@ -34,6 +32,11 @@ namespace Mastermind
             Image guessSelect;
 
             //Empty Guess Area
+            //Tap Gesture Recongizer
+            TapGestureRecognizer tap = new TapGestureRecognizer();
+            tap.NumberOfTapsRequired = 1;
+            tap.Tapped += Square_Tapped;
+
             //Add Image for each row & column needed
             for (int r = 1; r < NUM_ROW; r++)
             {
@@ -82,7 +85,7 @@ namespace Mastermind
                         guessSelect.Source = "Images/Empty.png";
 
                         //Will be used to change later
-                        guessSelect.StyleId = r+""+c;
+                        guessSelect.StyleId = r + "" + c;
 
                         //Set Value
                         guessSelect.SetValue(Grid.RowProperty, r);
@@ -94,19 +97,19 @@ namespace Mastermind
                 }
             }
             #endregion
-
-            //Just to Clear
-            currPinSelected = null;
         }
 
         //Colour Pins Tapped
         private void ColourPinsTapped(object sender, EventArgs e)
         {
+            //Update Counter
+            tapCount++;
+
             //Declare Variables
-            var imageSender = (Image)sender;
+            imagePinSender = (Image)sender;
             int selectedColour;
 
-            switch (imageSender.StyleId)
+            switch (imagePinSender.StyleId)
             {
                 case "RedDot":
                     selectedColour = 1;
@@ -120,84 +123,99 @@ namespace Mastermind
                     selectedColour = 3;
                     break;
 
+                case "BlackDot":
+                    selectedColour = 4;
+                    break;
+
+                case "WhiteDot":
+                    selectedColour = 5;
+                    break;
+
+                case "TanDot":
+                    selectedColour = 6;
+                    break;
+
+                case "YellowDot":
+                    selectedColour = 7;
+                    break;
+
+                case "OrangeDot":
+                    selectedColour = 8;
+                    break;
+
+                default:
+                    selectedColour = 0;
+                    break;
+            }
+
+            if(tapCount%2 > 0)
+            {
+                imagePinSender.Opacity = 0.5;
+            }
+            else
+            {
+                foreach(var piece in GrdGameLayout.Children)
+                {
+                    if(piece.StyleId.Contains("Dot"))
+                    {
+                        piece.Opacity = 1;
+                    }
+                }
+            }
+            
+        }
+
+        //
+        private void Answer(int selectedColour)
+        {
+            var answer = new Random();
+        }
+
+        //Square Tapped
+        private void Square_Tapped(object sender, EventArgs e)
+        {
+            //Declare Variables
+            int selectedColour;
+            var imageSender = (Image)sender;
+
+            switch (imagePinSender.StyleId)
+            {
                 case "RedDot":
                     selectedColour = 1;
                     break;
 
-                case "RedDot":
-                    selectedColour = 1;
+                case "GreenDot":
+                    selectedColour = 2;
                     break;
 
-                case "RedDot":
-                    selectedColour = 1;
+                case "BlueDot":
+                    selectedColour = 3;
                     break;
 
-                case "RedDot":
-                    selectedColour = 1;
+                case "BlackDot":
+                    selectedColour = 4;
                     break;
 
-                case "RedDot":
-                    selectedColour = 1;
+                case "WhiteDot":
+                    selectedColour = 5;
+                    break;
+
+                case "TanDot":
+                    selectedColour = 6;
+                    break;
+
+                case "YellowDot":
+                    selectedColour = 7;
+                    break;
+
+                case "OrangeDot":
+                    selectedColour = 8;
+                    break;
+
+                default:
+                    selectedColour = 0;
                     break;
             }
         }
-
-        //Move Piece To
-        private void MoveSelectedPieceTo(int destRow, int destColumn)
-        {
-            //Can only Move diagonally
-            String selectedPin;
-
-            //Selected Pin
-            selectedPin = currPinSelected.StyleId;
-
-            #region MoveThePin
-            //Get and Set Grid properties
-            currPinSelected.SetValue(Grid.RowProperty, destRow);
-            currPinSelected.SetValue(Grid.ColumnProperty, destColumn);
-
-            //Reset Piece
-            ResetCurrentSelectedPiece();
-            #endregion
-
-            //Then set current selected to null
-            currPinSelected = null;
-        }//End MoveSelectedPieceTo
-
-
-        //Select This Piece
-        private void SelectThisPiece(BoxView thisOne)
-        {
-            //Select Piece
-            if (currPinSelected == null)
-            {
-                //This Piece is Selected
-                currPinSelected = thisOne;
-
-                //Change Opacity
-                currPinSelected.Opacity = 0.7;
-            }
-
-            //Deselect
-            else
-            {
-                //Deselecting Piece
-                currPinSelected = null;
-
-                //Reset Piece Selected
-                ResetCurrentSelectedPiece();
-            }
-        }//End SelectThisPiece
-
-        //Reset Current Piece
-        private void ResetCurrentSelectedPiece()
-        {
-            //If no Piece Selected
-            if (currPinSelected == null) return;
-
-            //If Piece Selected
-            currPinSelected.Opacity = 1;
-        }//End ResetCurrrentPiece
-
     }
 }
