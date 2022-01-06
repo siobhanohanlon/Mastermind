@@ -12,14 +12,28 @@ namespace Mastermind
     {
         #region GlobalVariables
         //Constants
-        const int NUM_ROW = 11, NUM_COL = 4; //Guess Area
-        const int COR_ROW = 30, COR_COL = 2; //Correct Display
+        private const int NUM_ROW = 11, NUM_COL = 4; //Guess Area
+        private const int COR_ROW = 30, COR_COL = 2; //Correct Display
+        private const int NUM_ROUNDS = 10;
 
         //BoxView
         BoxView currPinSelected;
+        BoxView originalLocation;
 
-        //Global Vraible for Round
-        int round = 10;
+        //Global Variables
+        int pinAnswerCounter = 1;
+        int round = 1;
+
+        //Array for Colours
+        private static string[] ColourNames = {"Red", "Green", "Blue", "Black",
+                                               "White", "Purple", "Yellow", "Orange"};
+
+        Color[] pinColours = new Color[]
+            {Color.Red, Color.Green, Color.Blue, Color.Black,
+            Color.White, Color.Purple, Color.Yellow, Color.Orange};
+
+        Color[] userGuess = new Color[4];
+        Color[] answerCode = new Color[4];
         #endregion
 
         //Main
@@ -35,20 +49,42 @@ namespace Mastermind
             //Declare Variables
             Image guessSelect;
 
-            #region AnswerArea
-            //<!-- Answer Area -->
-            // < Image Source = "Images/QuestionMark.png" Grid.Column = "0" Grid.Row = "0" />
-            //< Image Source = "Images/QuestionMark.png" Grid.Column = "1" Grid.Row = "0" />
-            //< Image Source = "Images/QuestionMark.png" Grid.Column = "2" Grid.Row = "0" />
-            //< Image Source = "Images/QuestionMark.png" Grid.Column = "3" Grid.Row = "0" />
+            #region SetUpGameLayout
+            //Set up 4 Columns and 10 Rows to Grid in Xaml
+            for (int i = 0; i < 6; i++)
+            {
+                GrdGameLayout.ColumnDefinitions.Add(new ColumnDefinition());
+            }
 
+            for (int i = 0; i < 14; i++)
+            {
+                GrdGameLayout.RowDefinitions.Add(new RowDefinition());
+            }
+            #endregion
+
+            #region AnswerArea
+            for(int a = 0; a < 4; a++)
+            {
+                //Create Image
+                Image answer;
+                answer = new Image();
+                answer.Source = "Images/QuestionMark.png";
+                answer.StyleId = "A" + a;
+                answer.SetValue(Grid.RowProperty, 0);
+                answer.SetValue(Grid.ColumnProperty, a);
+                answer.HeightRequest = 40;
+                answer.WidthRequest = 40;
+
+                //Add to Children
+                GrdGameLayout.Children.Add(answer);
+            }
             #endregion
 
             #region SetUpGuessArea-Working
             //Tap Gesture Recongizer
             TapGestureRecognizer emptyTap = new TapGestureRecognizer();
             emptyTap.NumberOfTapsRequired = 1;
-            emptyTap.Tapped += Empty_Tapped;//squaretapped
+            emptyTap.Tapped += Empty_Tapped;
 
             //Add Boxview for each row & column needed
             for (int r = 1; r < NUM_ROW; r++)
@@ -79,50 +115,6 @@ namespace Mastermind
             }
             #endregion
 
-            #region CheckIfCorrectGuess
-
-            //Set up Board in xaml
-            //Column
-            for (int i = 0; i < 2; i++)
-            {
-                //New Column Definition
-                GrdCorrectDisplay.ColumnDefinitions.Add(new ColumnDefinition());
-            }
-            //Row
-            for (int i = 0; i < 30; i++)
-            {
-                //New Row Definition
-                GrdCorrectDisplay.RowDefinitions.Add(new RowDefinition());
-            }
-
-            //Area for Correct Guess
-            //Row
-            for (int r = 1; r < COR_ROW; r++)
-            {
-                //Column
-                for (int c = 0; c < COR_COL; c++)
-                {
-                    //Skip every 3rd Row for an Empty Space
-                    if ((r % 3) > 0)
-                    {
-                        //Create Image
-                        guessSelect = new Image();
-                        guessSelect.Source = "Images/Empty.png";
-
-                        //Will be used to change later
-                        guessSelect.StyleId = r + "" + c;
-
-                        //Set Value
-                        guessSelect.SetValue(Grid.RowProperty, r);
-                        guessSelect.SetValue(Grid.ColumnProperty, c);
-
-                        //Add to Children
-                        GrdCorrectDisplay.Children.Add(guessSelect);
-                    }
-                }
-            }
-            #endregion
-
             #region CreateColourPins
             //Tap Gesture Recongizer
             TapGestureRecognizer pinTap = new TapGestureRecognizer();
@@ -131,25 +123,29 @@ namespace Mastermind
             
             #region Red
             //Create new BoxView
-            BoxView redPin;
-            redPin = new BoxView();
-            redPin.BackgroundColor = Color.Red;
-            redPin.StyleId = "RedPin";
-            redPin.HorizontalOptions = LayoutOptions.Center;
-            redPin.VerticalOptions = LayoutOptions.Center;
-            redPin.HeightRequest = 40;
-            redPin.WidthRequest = 40;
-            redPin.CornerRadius = 40;
+            for(int j = 0; j < 4; j++)
+            {
+                BoxView redPin;
+                redPin = new BoxView();
+                redPin.BackgroundColor = Color.Red;
+                redPin.StyleId = "RedPin";
+                redPin.HorizontalOptions = LayoutOptions.Center;
+                redPin.VerticalOptions = LayoutOptions.Center;
+                redPin.HeightRequest = 40;
+                redPin.WidthRequest = 40;
+                redPin.CornerRadius = 40;
 
-            //Set Value
-            redPin.SetValue(Grid.RowProperty, 12);
-            redPin.SetValue(Grid.ColumnProperty, 0);
+                //Set Value
+                redPin.SetValue(Grid.RowProperty, 12);
+                redPin.SetValue(Grid.ColumnProperty, 0);
 
-            //Add Gesture Recognizer
-            redPin.GestureRecognizers.Add(pinTap);
+                //Add Gesture Recognizer
+                redPin.GestureRecognizers.Add(pinTap);
 
-            //Add to Children
-            GrdGameLayout.Children.Add(redPin);
+                //Add to Children
+                GrdGameLayout.Children.Add(redPin);
+            }
+            
             #endregion
 
             #region Green
@@ -314,6 +310,63 @@ namespace Mastermind
             #endregion
             #endregion
 
+            #region CheckIfCorrectGuess
+
+            //Set up Board in xaml
+            //Column
+            for (int i = 0; i < 2; i++)
+            {
+                //New Column Definition
+                GrdCorrectDisplay.ColumnDefinitions.Add(new ColumnDefinition());
+            }
+            //Row
+            for (int i = 0; i < 30; i++)
+            {
+                //New Row Definitions
+                GrdCorrectDisplay.RowDefinitions.Add(new RowDefinition());
+            }
+
+            //Area for Correct Guess
+            //Row
+            for (int r = 1; r < COR_ROW; r++)
+            {
+                //Column
+                for (int c = 0; c < COR_COL; c++)
+                {
+                    //Skip every 3rd Row for an Empty Space
+                    if ((r % 3) > 0)
+                    {
+                        //Create Image
+                        guessSelect = new Image();
+                        guessSelect.Source = "Images/Empty.png";
+
+                        //Will be used to change later
+                        guessSelect.StyleId = r + "" + c;
+
+                        //Set Value
+                        guessSelect.SetValue(Grid.RowProperty, r);
+                        guessSelect.SetValue(Grid.ColumnProperty, c);
+
+                        //Add to Children
+                        GrdCorrectDisplay.Children.Add(guessSelect);
+                    }
+                }
+            }
+            #endregion
+
+            #region CreateCheckButton
+            Button checkGuess;
+            checkGuess = new Button();
+            checkGuess.Text = "Check Guess";
+            checkGuess.SetValue(Grid.RowProperty, 14);
+            checkGuess.SetValue(Grid.ColumnProperty, 0);
+            checkGuess.SetValue(Grid.ColumnSpanProperty, 3);
+            checkGuess.HorizontalOptions = LayoutOptions.Center;
+            checkGuess.VerticalOptions = LayoutOptions.Center;
+            checkGuess.Clicked += BtnCheckGuess_Clicked;
+            GrdGameLayout.Children.Add(checkGuess);
+            #endregion
+
             //Clear Selected
             currPinSelected = null;
         }
@@ -322,12 +375,17 @@ namespace Mastermind
         #region ColourPinTapped
         private void PinTapped(object sender, EventArgs e)
         {
+            //Create Boxview
             BoxView currPiece = (BoxView)sender;
 
+            //Select Clicked Colour
             SelectThisColour(currPiece);
+
+            //Update Pin Count
+            pinAnswerCounter++;
         }
 
-        //
+        //Select the Pin
         private void SelectThisColour(BoxView thisOne)
         {
             //Select Piece
@@ -335,6 +393,7 @@ namespace Mastermind
             {
                 //This Piece is Selected
                 currPinSelected = thisOne;
+                originalLocation = thisOne;
 
                 //Change Opacity
                 currPinSelected.Opacity = 0.7;
@@ -351,23 +410,13 @@ namespace Mastermind
             }
         }
 
-        #region Working
-        //Move Colour Pin to Guess
-        private void MoveColourPinto(int destRow, int destCol)
-        {
-            if (destRow == round)
-            {
-                currPinSelected.SetValue(Grid.RowProperty, destRow);
-                currPinSelected.SetValue(Grid.ColumnProperty, destCol);
-            }
-
-            ResetCurrentSelectedPin();
-        }
-        #endregion
-
-        //Square Tapped
+        //Empty Square Tapped
         private void Empty_Tapped(object sender, EventArgs e)
         {
+            //is there a current piece selected
+            if (currPinSelected == null)
+                return;
+
             //Select Place to move to
             BoxView currSq = (BoxView)sender;
 
@@ -375,7 +424,31 @@ namespace Mastermind
             MoveColourPinto((int)currSq.GetValue(Grid.RowProperty),
                           (int)currSq.GetValue(Grid.ColumnProperty));
         }
-        
+
+        #region Working
+        //Move Colour Pin to Guess
+        private void MoveColourPinto(int destRow, int destCol)
+        {
+            //Declare Variables
+            int curRow, curCol;
+
+            if (destRow == round)
+            {
+                //Get Pins Original Location
+                curRow = (int)currPinSelected.GetValue(Grid.RowProperty);
+                curCol = (int)currPinSelected.GetValue(Grid.ColumnProperty);
+
+                currPinSelected.SetValue(Grid.RowProperty, destRow);
+                currPinSelected.SetValue(Grid.ColumnProperty, destCol);
+
+                originalLocation.SetValue(Grid.RowProperty, curRow);
+                originalLocation.SetValue(Grid.ColumnProperty, curCol);
+            }
+
+            ResetCurrentSelectedPin();
+        }
+        #endregion
+
         private void ColourPinsTapped(object sender, EventArgs e)
         {
         }
@@ -397,5 +470,53 @@ namespace Mastermind
         {
             var answer = new Random();
         }
+
+        #region CheckAnswer
+        //Check if answer is Correct
+        private void BtnCheckGuess_Clicked(object sender, EventArgs e)
+        {
+            //Check if Guess Row is Full before checking
+            if (!CheckIfRowIsFull())
+            {
+                //Display Alert to user
+                DisplayAlert("Warning", "Select 4 Colours!!", "Okay");
+
+                return;
+            }
+        }
+        
+        //Check if user entered 4 colours in current row
+        private bool CheckIfRowIsFull()
+        {
+            //Declare Variables
+            bool answer = true;
+
+            //Checking boxview for current row
+            foreach(var item in GrdGameLayout.Children)
+            {
+                //for all boxview in children
+                if(item.GetType() == typeof(BoxView))
+                {
+                    //Only Check Current Row
+                    int r = (int)item.GetValue(Grid.RowProperty);
+                    
+                    //If it is on current row
+                    if (r == round)
+                    {
+                        //Check if empty Space
+                        if (((BoxView)item).StyleId == "GuessArea")
+                        {
+                            //If so return
+                            answer = false;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            //Return
+            return answer;
+        }
+        #endregion
     }
 }

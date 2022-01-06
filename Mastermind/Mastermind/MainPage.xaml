@@ -4,89 +4,33 @@
              x:Class="Mastermind.MainPage">
 
         <!-- Area for Board -->
-    <StackLayout>
+    <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center">
+        
         <!-- Gameboard -->
-        <Frame x:Name="GameBoard" BackgroundColor="#d5e1df" Padding="20" CornerRadius="10">
+        <StackLayout Orientation="Horizontal" BackgroundColor="#d5e1df" Padding="20" HorizontalOptions="FillAndExpand">
             <Label Text="Play Mastermind" HorizontalTextAlignment="Center" 
                    TextColor="Black" FontSize="Medium"/>
-        </Frame>
+        </StackLayout>
 
-        <!--  Grid for the game board  -->
-        <Grid BackgroundColor="#C23E21" HeightRequest="800" 
-              WidthRequest="350" HorizontalOptions="Center" 
-              VerticalOptions="Center">
+        <!--  Grid for the game board background -->
+        <Grid BackgroundColor="#C23E21" HeightRequest="800" WidthRequest="350" 
+              HorizontalOptions="Center" VerticalOptions="Center">
+            
+            <!--  Grid for the game board-->
+            <Grid BackgroundColor="#E5694F" Margin="10" Grid.Row="0" 
+                  Grid.Column="0" Grid.ColumnSpan="7" Grid.RowSpan="15">
 
-            <Grid Grid.Row="0" Grid.Column="0"
-                  Grid.ColumnSpan="7" Grid.RowSpan="15"
-                  BackgroundColor="#E5694F" Margin="10" >
-                <!-- Columns -->
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-
-                <!-- Row -->
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
+                <!--  Grid for the game board layout -->
+                <Grid x:Name="GrdGameLayout" Grid.Row="0" Grid.Column="0"
+                  Grid.ColumnSpan="3" Grid.RowSpan="13"/>
             </Grid>
 
-            <Grid x:Name="GrdGameLayout" Grid.Row="1" Grid.Column="1"
-                  Grid.ColumnSpan="4" Grid.RowSpan="13">
-                <!-- Columns -->
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-
-                <!-- Row -->
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-
-                <!-- Answer Area -->
-                <Image Source="Images/QuestionMark.png" Grid.Column="0" Grid.Row="0"/>
-                <Image Source="Images/QuestionMark.png" Grid.Column="1" Grid.Row="0"/>
-                <Image Source="Images/QuestionMark.png" Grid.Column="2" Grid.Row="0"/>
-                <Image Source="Images/QuestionMark.png" Grid.Column="3" Grid.Row="0"/>
-
-            </Grid>
-
-            <!-- Correct Display Area -->
-            <Grid x:Name="GrdCorrectDisplay" Grid.Row="2" Grid.Column="5"
+        <!-- Correct Display Area -->
+            <Grid x:Name="GrdCorrectDisplay" Grid.Row="1" Grid.Column="5"
                   Grid.ColumnSpan="1" Grid.RowSpan="10" ColumnSpacing="0"
-                  RowSpacing="0" >
-                <!-- Columns -->
+                  RowSpacing="0">
+                
+                <!-- Column -->
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="14"/>
                     <ColumnDefinition Width="14"/>
@@ -94,7 +38,31 @@
 
                 <!-- Row -->
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="0"/>
+                    <RowDefinition Height="14"/>
+                    <RowDefinition Height="14"/>
+                    <RowDefinition Height="14"/>
+
+                    <RowDefinition Height="16"/>
+                    <RowDefinition Height="14"/>
+                    <RowDefinition Height="14"/>
+
+                    <RowDefinition Height="16"/>
+                    <RowDefinition Height="14"/>
+                    <RowDefinition Height="14"/>
+
+                    <RowDefinition Height="18"/>
+                    <RowDefinition Height="14"/>
+                    <RowDefinition Height="14"/>
+
+                    <RowDefinition Height="18"/>
+                    <RowDefinition Height="14"/>
+                    <RowDefinition Height="14"/>
+
+                    <RowDefinition Height="16"/>
+                    <RowDefinition Height="14"/>
+                    <RowDefinition Height="14"/>
+
+                    <RowDefinition Height="18"/>
                     <RowDefinition Height="14"/>
                     <RowDefinition Height="14"/>
 
@@ -106,31 +74,7 @@
                     <RowDefinition Height="14"/>
                     <RowDefinition Height="14"/>
 
-                    <RowDefinition Height="14"/>
-                    <RowDefinition Height="14"/>
-                    <RowDefinition Height="14"/>
-
-                    <RowDefinition Height="15"/>
-                    <RowDefinition Height="14"/>
-                    <RowDefinition Height="14"/>
-
-                    <RowDefinition Height="16"/>
-                    <RowDefinition Height="14"/>
-                    <RowDefinition Height="14"/>
-
-                    <RowDefinition Height="14"/>
-                    <RowDefinition Height="14"/>
-                    <RowDefinition Height="14"/>
-
-                    <RowDefinition Height="14"/>
-                    <RowDefinition Height="14"/>
-                    <RowDefinition Height="14"/>
-
-                    <RowDefinition Height="16"/>
-                    <RowDefinition Height="14"/>
-                    <RowDefinition Height="14"/>
-
-                    <RowDefinition Height="14"/>
+                    <RowDefinition Height="18"/>
                     <RowDefinition Height="14"/>
                     <RowDefinition Height="14"/>
                 </Grid.RowDefinitions>
