@@ -10,12 +10,12 @@
             <Label Text="Play Mastermind" HorizontalTextAlignment="Center" 
                    TextColor="Black" FontSize="Medium"/>
         </Frame>
-        
+
         <!--  Grid for the game board  -->
         <Grid BackgroundColor="#C23E21" HeightRequest="800" 
               WidthRequest="350" HorizontalOptions="Center" 
               VerticalOptions="Center">
-            
+
             <Grid Grid.Row="0" Grid.Column="0"
                   Grid.ColumnSpan="7" Grid.RowSpan="15"
                   BackgroundColor="#E5694F" Margin="10" >
@@ -48,7 +48,7 @@
             </Grid>
 
             <Grid x:Name="GrdGameLayout" Grid.Row="1" Grid.Column="1"
-                  Grid.ColumnSpan="4" Grid.RowSpan="10">
+                  Grid.ColumnSpan="4" Grid.RowSpan="13">
                 <!-- Columns -->
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
@@ -69,16 +69,19 @@
                     <RowDefinition/>
                     <RowDefinition/>
                     <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                    <RowDefinition/>
                 </Grid.RowDefinitions>
-                
+
                 <!-- Answer Area -->
                 <Image Source="Images/QuestionMark.png" Grid.Column="0" Grid.Row="0"/>
                 <Image Source="Images/QuestionMark.png" Grid.Column="1" Grid.Row="0"/>
                 <Image Source="Images/QuestionMark.png" Grid.Column="2" Grid.Row="0"/>
                 <Image Source="Images/QuestionMark.png" Grid.Column="3" Grid.Row="0"/>
-                
+
             </Grid>
-            
+
             <!-- Correct Display Area -->
             <Grid x:Name="GrdCorrectDisplay" Grid.Row="2" Grid.Column="5"
                   Grid.ColumnSpan="1" Grid.RowSpan="10" ColumnSpacing="0"
@@ -95,11 +98,15 @@
                     <RowDefinition Height="14"/>
                     <RowDefinition Height="14"/>
 
-                    <RowDefinition Height="14"/>
+                    <RowDefinition Height="16"/>
                     <RowDefinition Height="14"/>
                     <RowDefinition Height="14"/>
 
-                    <RowDefinition Height="12"/>
+                    <RowDefinition Height="16"/>
+                    <RowDefinition Height="14"/>
+                    <RowDefinition Height="14"/>
+
+                    <RowDefinition Height="14"/>
                     <RowDefinition Height="14"/>
                     <RowDefinition Height="14"/>
 
@@ -107,11 +114,7 @@
                     <RowDefinition Height="14"/>
                     <RowDefinition Height="14"/>
 
-                    <RowDefinition Height="15"/>
-                    <RowDefinition Height="14"/>
-                    <RowDefinition Height="14"/>
-
-                    <RowDefinition Height="15"/>
+                    <RowDefinition Height="16"/>
                     <RowDefinition Height="14"/>
                     <RowDefinition Height="14"/>
 
@@ -123,7 +126,7 @@
                     <RowDefinition Height="14"/>
                     <RowDefinition Height="14"/>
 
-                    <RowDefinition Height="14"/>
+                    <RowDefinition Height="16"/>
                     <RowDefinition Height="14"/>
                     <RowDefinition Height="14"/>
 
@@ -132,89 +135,6 @@
                     <RowDefinition Height="14"/>
                 </Grid.RowDefinitions>
             </Grid>
-            
-            <!-- Colour Pin Area -->
-            <Grid Grid.Row="11" Grid.Column="1" 
-                  Grid.ColumnSpan="4" Grid.RowSpan="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition/>
-                    <RowDefinition/>
-                </Grid.RowDefinitions>
-                
-                <!-- Images for Colour Pins -->
-                <!-- Red -->
-                <Image StyleId="RedDot" Source="Images/RedDot.png" Grid.Column="0" Grid.Row="0">
-                    <Image.GestureRecognizers>
-                        <TapGestureRecognizer
-                            Tapped="ColourPinsTapped" NumberOfTapsRequired="1" />
-                    </Image.GestureRecognizers>
-                </Image>
-                
-                <!-- Green -->
-                <Image StyleId ="GreenDot" Source="Images/GreenDot.png" Grid.Column="1" Grid.Row="0">
-                    <Image.GestureRecognizers>
-                        <TapGestureRecognizer
-                                Tapped="ColourPinsTapped" NumberOfTapsRequired="1" />
-                    </Image.GestureRecognizers>
-                </Image>
-                
-                <!-- Blue -->
-                <Image StyleId="BlueDot" Source="Images/BlueDot.png" Grid.Column="2" Grid.Row="0">
-                    <Image.GestureRecognizers>
-                        <TapGestureRecognizer
-                            Tapped="ColourPinsTapped" NumberOfTapsRequired="1" />
-                    </Image.GestureRecognizers>
-                </Image>
-                
-                <!-- Black -->
-                <Image StyleId="BlackDot" Source="Images/BlackDot.png" Grid.Column="3" Grid.Row="0">
-                    <Image.GestureRecognizers>
-                        <TapGestureRecognizer
-                            Tapped="ColourPinsTapped" NumberOfTapsRequired="1" />
-                    </Image.GestureRecognizers>
-                </Image>
-
-                <!-- White -->
-                <Image StyleId="WhiteDot" Source="Images/WhiteDot.png" Grid.Column="0" Grid.Row="1">
-                    <Image.GestureRecognizers>
-                        <TapGestureRecognizer
-                            Tapped="ColourPinsTapped" NumberOfTapsRequired="1" />
-                    </Image.GestureRecognizers>
-                </Image>
-                
-                <!-- Tan -->
-                <Image StyleId="TanDot" Source="Images/TanDot.png" Grid.Column="1" Grid.Row="1">
-                    <Image.GestureRecognizers>
-                        <TapGestureRecognizer
-                            Tapped="ColourPinsTapped" NumberOfTapsRequired="1" />
-                    </Image.GestureRecognizers>
-                </Image>
-                
-                <!-- Yellow -->
-                <Image StyleId="YellowDot" Source="Images/YellowDot.png" Grid.Column="2" Grid.Row="1">
-                    <Image.GestureRecognizers>
-                        <TapGestureRecognizer
-                            Tapped="ColourPinsTapped" NumberOfTapsRequired="1" />
-                    </Image.GestureRecognizers>
-                </Image>
-                
-                <!-- Orange -->
-                <Image StyleId="OrangeDot" Source="Images/OrangeDot.png" Grid.Column="3" Grid.Row="1">
-                    <Image.GestureRecognizers>
-                        <TapGestureRecognizer
-                            Tapped="ColourPinsTapped" NumberOfTapsRequired="1" />
-                    </Image.GestureRecognizers>
-                </Image>
-            </Grid>
-
         </Grid>
     </StackLayout>
-
-    <!-- End of Gameboard -->
-    </ContentPage>
+</ContentPage>
