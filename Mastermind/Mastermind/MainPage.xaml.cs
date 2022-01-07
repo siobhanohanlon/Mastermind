@@ -14,26 +14,33 @@ namespace Mastermind
         //Constants
         private const int NUM_ROW = 11, NUM_COL = 4; //Guess Area
         private const int COR_ROW = 30, COR_COL = 2; //Correct Display
-        private const int NUM_ROUNDS = 10;
+        private const int NUM_ROUNDS = 11; //As Starting Round is 1, Actual #Rounds is 10
 
         //BoxView
         BoxView currPinSelected;
-        BoxView originalLocation;
+
+        //Create an instance of Random class
+        Random randAns;
 
         //Global Variables
-        int pinAnswerCounter = 1;
-        int round = 1;
+        private int round;
+        private int currRow;
+        private Color guessAreaColour = Color.SaddleBrown;
 
         //Array for Colours
         private static string[] ColourNames = {"Red", "Green", "Blue", "Black",
                                                "White", "Purple", "Yellow", "Orange"};
 
-        Color[] pinColours = new Color[]
+        Color[] pinColours = new Color[8]
             {Color.Red, Color.Green, Color.Blue, Color.Black,
             Color.White, Color.Purple, Color.Yellow, Color.Orange};
 
-        Color[] userGuess = new Color[4];
-        Color[] answerCode = new Color[4];
+        int[] answerCode = new int[4];
+        int[] userGuess = new int[4];
+
+        int[] colPins = new int[4];
+        int[] redPins = new int[40];
+        int[] whitePins = new int[40];
         #endregion
 
         //Main
@@ -41,6 +48,7 @@ namespace Mastermind
         {
             InitializeComponent();
             SetUpBoard();
+            NewGame();
         }
 
         //Set Up Board
@@ -48,6 +56,7 @@ namespace Mastermind
         {
             //Declare Variables
             Image guessSelect;
+            round = 1;
 
             #region SetUpGameLayout
             //Set up 4 Columns and 10 Rows to Grid in Xaml
@@ -56,14 +65,14 @@ namespace Mastermind
                 GrdGameLayout.ColumnDefinitions.Add(new ColumnDefinition());
             }
 
-            for (int i = 0; i < 14; i++)
+            for (int i = 0; i < 16; i++)
             {
                 GrdGameLayout.RowDefinitions.Add(new RowDefinition());
             }
             #endregion
 
-            #region AnswerArea
-            for(int a = 0; a < 4; a++)
+            #region SetUpAnswerArea
+            for (int a = 0; a < 4; a++)
             {
                 //Create Image
                 Image answer;
@@ -80,11 +89,10 @@ namespace Mastermind
             }
             #endregion
 
-            #region SetUpGuessArea-Working
+            #region SetUpGuessArea
             //Tap Gesture Recongizer
             TapGestureRecognizer emptyTap = new TapGestureRecognizer();
-            emptyTap.NumberOfTapsRequired = 1;
-            emptyTap.Tapped += Empty_Tapped;
+            emptyTap.Tapped += MovePinTo;
 
             //Add Boxview for each row & column needed
             for (int r = 1; r < NUM_ROW; r++)
@@ -94,7 +102,7 @@ namespace Mastermind
                     //Create new BoxView
                     BoxView emptyGuess;
                     emptyGuess = new BoxView();
-                    emptyGuess.BackgroundColor = Color.SaddleBrown;
+                    emptyGuess.Color = guessAreaColour;
                     emptyGuess.StyleId = "GuessArea";
                     emptyGuess.HorizontalOptions = LayoutOptions.Center;
                     emptyGuess.VerticalOptions = LayoutOptions.Center;
@@ -118,199 +126,41 @@ namespace Mastermind
             #region CreateColourPins
             //Tap Gesture Recongizer
             TapGestureRecognizer pinTap = new TapGestureRecognizer();
-            pinTap.NumberOfTapsRequired = 1;
             pinTap.Tapped += PinTapped;
-            
-            #region Red
-            //Create new BoxView
-            for(int j = 0; j < 4; j++)
+            int h = 0;
+
+            //Used for Arrays
+            if(h < 9)
             {
-                BoxView redPin;
-                redPin = new BoxView();
-                redPin.BackgroundColor = Color.Red;
-                redPin.StyleId = "RedPin";
-                redPin.HorizontalOptions = LayoutOptions.Center;
-                redPin.VerticalOptions = LayoutOptions.Center;
-                redPin.HeightRequest = 40;
-                redPin.WidthRequest = 40;
-                redPin.CornerRadius = 40;
+                //Rows
+                for(int ro = 12; ro < 14; ro++)
+                {
+                    for(int co = 0; co < 4; co++)
+                    {
+                        BoxView pin;
+                        pin = new BoxView();
+                        pin.Color = pinColours[h];
+                        pin.StyleId = ColourNames[h] + "Pin";
+                        pin.HorizontalOptions = LayoutOptions.Center;
+                        pin.VerticalOptions = LayoutOptions.Center;
+                        pin.HeightRequest = 40;
+                        pin.WidthRequest = 40;
+                        pin.CornerRadius = 40;
 
-                //Set Value
-                redPin.SetValue(Grid.RowProperty, 12);
-                redPin.SetValue(Grid.ColumnProperty, 0);
+                        pin.SetValue(Grid.RowProperty, ro);
+                        pin.SetValue(Grid.ColumnProperty, co);
 
-                //Add Gesture Recognizer
-                redPin.GestureRecognizers.Add(pinTap);
+                        pin.GestureRecognizers.Add(pinTap);
 
-                //Add to Children
-                GrdGameLayout.Children.Add(redPin);
+                        GrdGameLayout.Children.Add(pin);
+
+                        h++;
+                    }
+                }
             }
-            
             #endregion
 
-            #region Green
-            //Create new BoxView
-            BoxView greenPin;
-            greenPin = new BoxView();
-            greenPin.BackgroundColor = Color.Green;
-            greenPin.StyleId = "GreenPin";
-            greenPin.HorizontalOptions = LayoutOptions.Center;
-            greenPin.VerticalOptions = LayoutOptions.Center;
-            greenPin.HeightRequest = 40;
-            greenPin.WidthRequest = 40;
-            greenPin.CornerRadius = 40;
-
-            //Set Value
-            greenPin.SetValue(Grid.RowProperty, 12);
-            greenPin.SetValue(Grid.ColumnProperty, 1);
-
-            //Add Gesture Recognizer
-            greenPin.GestureRecognizers.Add(pinTap);
-
-            //Add to Children
-            GrdGameLayout.Children.Add(greenPin);
-            #endregion
-            
-            #region Blue
-            //Create new BoxView
-            BoxView bluePin;
-            bluePin = new BoxView();
-            bluePin.BackgroundColor = Color.Blue;
-            bluePin.StyleId = "BluePin";
-            bluePin.HorizontalOptions = LayoutOptions.Center;
-            bluePin.VerticalOptions = LayoutOptions.Center;
-            bluePin.HeightRequest = 40;
-            bluePin.WidthRequest = 40;
-            bluePin.CornerRadius = 40;
-
-            //Set Value
-            bluePin.SetValue(Grid.RowProperty, 12);
-            bluePin.SetValue(Grid.ColumnProperty, 2);
-
-            //Add Gesture Recognizer
-            bluePin.GestureRecognizers.Add(pinTap);
-
-            //Add to Children
-            GrdGameLayout.Children.Add(bluePin);
-            #endregion
-            
-            #region Black
-            //Create new BoxView
-            BoxView blackPin;
-            blackPin = new BoxView();
-            blackPin.BackgroundColor = Color.Black;
-            blackPin.StyleId = "BlackPin";
-            blackPin.HorizontalOptions = LayoutOptions.Center;
-            blackPin.VerticalOptions = LayoutOptions.Center;
-            blackPin.HeightRequest = 40;
-            blackPin.WidthRequest = 40;
-            blackPin.CornerRadius = 40;
-
-            //Set Value
-            blackPin.SetValue(Grid.RowProperty, 12);
-            blackPin.SetValue(Grid.ColumnProperty, 3);
-
-            //Add Gesture Recognizer
-            blackPin.GestureRecognizers.Add(pinTap);
-
-            //Add to Children
-            GrdGameLayout.Children.Add(blackPin);
-            #endregion
-            
-            #region White
-            //Create new BoxView
-            BoxView whitePin;
-            whitePin = new BoxView();
-            whitePin.BackgroundColor = Color.White;
-            whitePin.StyleId = "WhitePin";
-            whitePin.HorizontalOptions = LayoutOptions.Center;
-            whitePin.VerticalOptions = LayoutOptions.Center;
-            whitePin.HeightRequest = 40;
-            whitePin.WidthRequest = 40;
-            whitePin.CornerRadius = 40;
-
-            //Set Value
-            whitePin.SetValue(Grid.RowProperty, 13);
-            whitePin.SetValue(Grid.ColumnProperty, 0);
-
-            //Add Gesture Recognizer
-            whitePin.GestureRecognizers.Add(pinTap);
-
-            //Add to Children
-            GrdGameLayout.Children.Add(whitePin);
-            #endregion
-            
-            #region Purple
-            //Create new BoxView
-            BoxView purplePin;
-            purplePin = new BoxView();
-            purplePin.BackgroundColor = Color.Purple;
-            purplePin.StyleId = "PurplePin";
-            purplePin.HorizontalOptions = LayoutOptions.Center;
-            purplePin.VerticalOptions = LayoutOptions.Center;
-            purplePin.HeightRequest = 40;
-            purplePin.WidthRequest = 40;
-            purplePin.CornerRadius = 40;
-
-            //Set Value
-            purplePin.SetValue(Grid.RowProperty, 13);
-            purplePin.SetValue(Grid.ColumnProperty, 1);
-
-            //Add Gesture Recognizer
-            purplePin.GestureRecognizers.Add(pinTap);
-
-            //Add to Children
-            GrdGameLayout.Children.Add(purplePin);
-            #endregion
-            
-            #region Yellow
-            //Create new BoxView
-            BoxView yellowPin;
-            yellowPin = new BoxView();
-            yellowPin.BackgroundColor = Color.Yellow;
-            yellowPin.StyleId = "YellowPin";
-            yellowPin.HorizontalOptions = LayoutOptions.Center;
-            yellowPin.VerticalOptions = LayoutOptions.Center;
-            yellowPin.HeightRequest = 40;
-            yellowPin.WidthRequest = 40;
-            yellowPin.CornerRadius = 40;
-
-            //Set Value
-            yellowPin.SetValue(Grid.RowProperty, 13);
-            yellowPin.SetValue(Grid.ColumnProperty, 2);
-
-            //Add Gesture Recognizer
-            yellowPin.GestureRecognizers.Add(pinTap);
-
-            //Add to Children
-            GrdGameLayout.Children.Add(yellowPin);
-            #endregion
-            
-            #region Orange
-            //Create new BoxView
-            BoxView orangePin;
-            orangePin = new BoxView();
-            orangePin.BackgroundColor = Color.Orange;
-            orangePin.StyleId = "OrangePin";
-            orangePin.HorizontalOptions = LayoutOptions.Center;
-            orangePin.VerticalOptions = LayoutOptions.Center;
-            orangePin.HeightRequest = 40;
-            orangePin.WidthRequest = 40;
-            orangePin.CornerRadius = 40;
-
-            //Set Value
-            orangePin.SetValue(Grid.RowProperty, 13);
-            orangePin.SetValue(Grid.ColumnProperty, 3);
-
-            //Add Gesture Recognizer
-            orangePin.GestureRecognizers.Add(pinTap);
-
-            //Add to Children
-            GrdGameLayout.Children.Add(orangePin);
-            #endregion
-            #endregion
-
-            #region CheckIfCorrectGuess
+            #region SetUpCheckAnswerArea
 
             //Set up Board in xaml
             //Column
@@ -355,16 +205,56 @@ namespace Mastermind
             #endregion
 
             #region CreateCheckButton
-            Button checkGuess;
-            checkGuess = new Button();
-            checkGuess.Text = "Check Guess";
-            checkGuess.SetValue(Grid.RowProperty, 14);
-            checkGuess.SetValue(Grid.ColumnProperty, 0);
-            checkGuess.SetValue(Grid.ColumnSpanProperty, 3);
-            checkGuess.HorizontalOptions = LayoutOptions.Center;
-            checkGuess.VerticalOptions = LayoutOptions.Center;
-            checkGuess.Clicked += BtnCheckGuess_Clicked;
-            GrdGameLayout.Children.Add(checkGuess);
+            Button btnCheckGuess;
+            btnCheckGuess = new Button();
+            btnCheckGuess.Text = "Check Guess";
+            btnCheckGuess.SetValue(Grid.RowProperty, 13);
+            btnCheckGuess.SetValue(Grid.ColumnProperty, 4);
+            btnCheckGuess.SetValue(Grid.ColumnSpanProperty, 2);
+            btnCheckGuess.HorizontalOptions = LayoutOptions.Center;
+            btnCheckGuess.VerticalOptions = LayoutOptions.Center;
+            btnCheckGuess.Clicked += BtnCheckGuess_Clicked;
+            GrdGameLayout.Children.Add(btnCheckGuess);
+            #endregion
+
+            #region CreateNewGameButton
+
+            Button BtnNewGame;
+            BtnNewGame = new Button();
+            BtnNewGame.Text = "New Game";
+            BtnNewGame.SetValue(Grid.RowProperty, 15);
+            BtnNewGame.SetValue(Grid.ColumnProperty, 0);
+            BtnNewGame.SetValue(Grid.ColumnSpanProperty, 2);
+            BtnNewGame.HorizontalOptions = LayoutOptions.Center;
+            BtnNewGame.VerticalOptions = LayoutOptions.Center;
+            BtnNewGame.Clicked += BtnNewGame_Clicked;
+            GrdGameLayout.Children.Add(BtnNewGame);
+            #endregion
+
+            #region CreateSaveButton
+            Button BtnSaveGame;
+            BtnSaveGame = new Button();
+            BtnSaveGame.Text = "Load Game";
+            BtnSaveGame.SetValue(Grid.RowProperty, 15);
+            BtnSaveGame.SetValue(Grid.ColumnProperty, 2);
+            BtnSaveGame.SetValue(Grid.ColumnSpanProperty, 2);
+            BtnSaveGame.HorizontalOptions = LayoutOptions.Center;
+            BtnSaveGame.VerticalOptions = LayoutOptions.Center;
+            BtnSaveGame.Clicked += BtnSaveGame_Clicked;
+            GrdGameLayout.Children.Add(BtnSaveGame);
+            #endregion
+
+            #region CreateLoadButton
+            Button BtnLoadGame;
+            BtnLoadGame = new Button();
+            BtnLoadGame.Text = "Save Game";
+            BtnLoadGame.SetValue(Grid.RowProperty, 15);
+            BtnLoadGame.SetValue(Grid.ColumnProperty, 4);
+            BtnLoadGame.SetValue(Grid.ColumnSpanProperty, 2);
+            BtnLoadGame.HorizontalOptions = LayoutOptions.Center;
+            BtnLoadGame.VerticalOptions = LayoutOptions.Center;
+            BtnLoadGame.Clicked += BtnLoadGame_Clicked;
+            GrdGameLayout.Children.Add(BtnLoadGame);
             #endregion
 
             //Clear Selected
@@ -376,43 +266,41 @@ namespace Mastermind
         private void PinTapped(object sender, EventArgs e)
         {
             //Create Boxview
-            BoxView currPiece = (BoxView)sender;
+            BoxView currPin = (BoxView)sender;
+
+            foreach(var pin in GrdGameLayout.Children)
+            {
+                //for all boxview in children
+                if (pin.GetType() == typeof(BoxView))
+                {
+                    //Check if empty Space
+                    if (((BoxView)pin).StyleId.Contains("Pin"))
+                    {
+                        ((BoxView)pin).Opacity = 1;
+                    }
+                }
+            }
 
             //Select Clicked Colour
-            SelectThisColour(currPiece);
-
-            //Update Pin Count
-            pinAnswerCounter++;
+            SelectThisColour(currPin);
         }
 
         //Select the Pin
         private void SelectThisColour(BoxView thisOne)
         {
-            //Select Piece
-            if (currPinSelected == null)
-            {
-                //This Piece is Selected
-                currPinSelected = thisOne;
-                originalLocation = thisOne;
+            //This Piece is Selected
+            currPinSelected = thisOne;
 
-                //Change Opacity
-                currPinSelected.Opacity = 0.7;
-            }
-
-            //Deselect
-            else
-            {
-                //Deselecting Piece
-                currPinSelected = null;
-
-                //Reset Piece Selected
-                ResetCurrentSelectedPin();
-            }
+            //Change Opacity
+            currPinSelected.Opacity = 0.5;
         }
 
-        //Empty Square Tapped
-        private void Empty_Tapped(object sender, EventArgs e)
+        //Move Selected Pin
+        private void MovePinTo(object sender, EventArgs e)
         {
+            //Variables
+            int destRow, destCol;
+
             //is there a current piece selected
             if (currPinSelected == null)
                 return;
@@ -421,93 +309,264 @@ namespace Mastermind
             BoxView currSq = (BoxView)sender;
 
             //Where Placing Pin
-            MoveColourPinto((int)currSq.GetValue(Grid.RowProperty),
-                          (int)currSq.GetValue(Grid.ColumnProperty));
-        }
+            destRow = (int)currSq.GetValue(Grid.RowProperty);
+            destCol = (int)currSq.GetValue(Grid.ColumnProperty);
 
-        #region Working
-        //Move Colour Pin to Guess
-        private void MoveColourPinto(int destRow, int destCol)
-        {
-            //Declare Variables
-            int curRow, curCol;
+            //Tap Gesture Recongizer
+            TapGestureRecognizer pinTap = new TapGestureRecognizer();
+            pinTap.Tapped += MovePinTo;
 
-            if (destRow == round)
+            //New BoxView
+            BoxView placePin;
+            placePin = new BoxView();
+            placePin.Color = currPinSelected.Color;
+            placePin.StyleId = "SelectedPin";
+            placePin.HorizontalOptions = LayoutOptions.Center;
+            placePin.VerticalOptions = LayoutOptions.Center;
+            placePin.HeightRequest = currPinSelected.HeightRequest;
+            placePin.WidthRequest = currPinSelected.WidthRequest;
+            placePin.CornerRadius = currPinSelected.CornerRadius;
+
+            placePin.GestureRecognizers.Add(pinTap);
+
+            GrdGameLayout.Children.Add(placePin);
+
+            if (destRow == (NUM_ROUNDS - round))
             {
-                //Get Pins Original Location
-                curRow = (int)currPinSelected.GetValue(Grid.RowProperty);
-                curCol = (int)currPinSelected.GetValue(Grid.ColumnProperty);
+                placePin.SetValue(Grid.RowProperty, destRow);
+                placePin.SetValue(Grid.ColumnProperty, destCol);
 
-                currPinSelected.SetValue(Grid.RowProperty, destRow);
-                currPinSelected.SetValue(Grid.ColumnProperty, destCol);
+                GrdGameLayout.Children.Remove(currSq);
 
-                originalLocation.SetValue(Grid.RowProperty, curRow);
-                originalLocation.SetValue(Grid.ColumnProperty, curCol);
+                #region SetPinToUserGuess
+                //Red
+                if (placePin.Color == Color.Red)
+                {
+                    switch (placePin.GetValue(Grid.ColumnProperty))
+                    {
+                        case 0:
+                            userGuess[0] = 1;
+                            break;
+                        case 1:
+                            userGuess[1] = 1;
+                            break;
+                        case 2:
+                            userGuess[2] = 1;
+                            break;
+                        case 3:
+                            userGuess[3] = 1;
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+
+                //Green
+                if (placePin.Color == Color.Green)
+                {
+                    switch (placePin.GetValue(Grid.ColumnProperty))
+                    {
+                        case 0:
+                            userGuess[0] = 2;
+                            break;
+                        case 1:
+                            userGuess[1] = 2;
+                            break;
+                        case 2:
+                            userGuess[2] = 2;
+                            break;
+                        case 3:
+                            userGuess[3] = 2;
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+
+                //Blue
+                if (placePin.Color == Color.Blue)
+                {
+                    switch (placePin.GetValue(Grid.ColumnProperty))
+                    {
+                        case 0:
+                            userGuess[0] = 3;
+                            break;
+                        case 1:
+                            userGuess[1] = 3;
+                            break;
+                        case 2:
+                            userGuess[2] = 3;
+                            break;
+                        case 3:
+                            userGuess[3] = 3;
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+
+                //Black
+                if (placePin.Color == Color.Black)
+                {
+                    switch (placePin.GetValue(Grid.ColumnProperty))
+                    {
+                        case 0:
+                            userGuess[0] = 4;
+                            break;
+                        case 1:
+                            userGuess[1] = 4;
+                            break;
+                        case 2:
+                            userGuess[2] = 4;
+                            break;
+                        case 3:
+                            userGuess[3] = 4;
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+
+                //White
+                if (placePin.Color == Color.White)
+                {
+                    switch (placePin.GetValue(Grid.ColumnProperty))
+                    {
+                        case 0:
+                            userGuess[0] = 5;
+                            break;
+                        case 1:
+                            userGuess[1] = 5;
+                            break;
+                        case 2:
+                            userGuess[2] = 5;
+                            break;
+                        case 3:
+                            userGuess[3] = 5;
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+
+                //Purple
+                if (placePin.Color == Color.Purple)
+                {
+                    switch (placePin.GetValue(Grid.ColumnProperty))
+                    {
+                        case 0:
+                            userGuess[0] = 6;
+                            break;
+                        case 1:
+                            userGuess[1] = 6;
+                            break;
+                        case 2:
+                            userGuess[2] = 6;
+                            break;
+                        case 3:
+                            userGuess[3] = 6;
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+
+                //Yellow
+                if (placePin.Color == Color.Yellow)
+                {
+                    switch (placePin.GetValue(Grid.ColumnProperty))
+                    {
+                        case 0:
+                            userGuess[0] = 7;
+                            break;
+                        case 1:
+                            userGuess[1] = 7;
+                            break;
+                        case 2:
+                            userGuess[2] = 7;
+                            break;
+                        case 3:
+                            userGuess[3] = 7;
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+
+                //Orange
+                if (placePin.Color == Color.Orange)
+                {
+                    switch (placePin.GetValue(Grid.ColumnProperty))
+                    {
+                        case 0:
+                            userGuess[0] = 8;
+                            break;
+                        case 1:
+                            userGuess[1] = 8;
+                            break;
+                        case 2:
+                            userGuess[2] = 8;
+                            break;
+                        case 3:
+                            userGuess[3] = 8;
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+                #endregion
             }
-
-            ResetCurrentSelectedPin();
         }
         #endregion
 
-        private void ColourPinsTapped(object sender, EventArgs e)
-        {
-        }
-        #endregion
-
-        //Reset Current Colour
-        private void ResetCurrentSelectedPin()
-        {
-            //If no Piece Selected
-            if (currPinSelected == null) return;
-
-            //If Piece Selected
-            currPinSelected.Opacity = 1;
-        }//End ResetCurrrentPiece
-
-
-        //
-        private void Answer(int selectedColour)
-        {
-            var answer = new Random();
-        }
-
-        #region CheckAnswer
+        #region CheckButton
         //Check if answer is Correct
         private void BtnCheckGuess_Clicked(object sender, EventArgs e)
         {
+            currRow = NUM_ROW - round;
+
             //Check if Guess Row is Full before checking
-            if (!CheckIfRowIsFull())
+            if (!CheckCurrRow())
             {
                 //Display Alert to user
                 DisplayAlert("Warning", "Select 4 Colours!!", "Okay");
-
                 return;
             }
+
+            //Check User Guess Against Answer
+            else
+            {
+                CheckUserGuess(currRow);
+            }
         }
-        
+
         //Check if user entered 4 colours in current row
-        private bool CheckIfRowIsFull()
+        private bool CheckCurrRow()
         {
             //Declare Variables
-            bool answer = true;
+            bool rowFull = true;
+            currRow = (NUM_ROW - round);
 
-            //Checking boxview for current row
-            foreach(var item in GrdGameLayout.Children)
+            foreach (var item in GrdGameLayout.Children)
             {
-                //for all boxview in children
-                if(item.GetType() == typeof(BoxView))
+                //If it is equal to the boxview
+                if (item.GetType() == typeof(BoxView))
                 {
-                    //Only Check Current Row
                     int r = (int)item.GetValue(Grid.RowProperty);
-                    
-                    //If it is on current row
-                    if (r == round)
+                    if (r == currRow)
                     {
-                        //Check if empty Space
-                        if (((BoxView)item).StyleId == "GuessArea")
+                        if (((BoxView)item).Color == guessAreaColour)
                         {
-                            //If so return
-                            answer = false;
+                            rowFull = false;
+                            
                             break;
                         }
                     }
@@ -515,7 +574,174 @@ namespace Mastermind
             }
 
             //Return
-            return answer;
+            return rowFull;
+        }
+        #endregion
+
+        #region CheckUserGuessVsAnswer
+        private void CheckUserGuess(int currRow)
+        {
+            //Declare Variables
+            //White = 1, Red = 2
+            //MinRow - start, MaxRow - Finish
+            int minRow = 0, maxRow = 0;
+            int red = 0, white = 0;
+
+            switch (currRow)
+            {
+                case 1:
+                    minRow = 1;
+                    maxRow = 3;
+                    break;
+                case 2:
+                    minRow = 4;
+                    maxRow = 6;
+                    break;
+                case 3:
+                    minRow = 7;
+                    maxRow = 9;
+                    break;
+                case 4:
+                    minRow = 10;
+                    maxRow = 12;
+                    break;
+                case 5:
+                    minRow = 13;
+                    maxRow = 15;
+                    break;
+                case 6:
+                    minRow = 16;
+                    maxRow = 18;
+                    break;
+                case 7:
+                    minRow = 19;
+                    maxRow = 21;
+                    break;
+                case 8:
+                    minRow = 22;
+                    maxRow = 24;
+                    break;
+                case 9:
+                    minRow = 25;
+                    maxRow = 27;
+                    break;
+                case 10:
+                    minRow = 28;
+                    maxRow = 30;
+                    break;
+
+                default:
+                    break;
+            }
+
+            for (int check = 0; check < 4; check++)
+            {
+                int index = Array.IndexOf(answerCode, userGuess[check]);
+
+                //If User Colour is Correct
+                if (index > -1)
+                {
+                    //Correct Colour and Place
+                    if (answerCode[check].Equals(userGuess[check]))
+                    {
+                        colPins[check] = 2;//Red
+                    }
+                    else
+                    {
+                        //Correct Colour
+                        colPins[check] = 1;//White
+                    }                    
+                }
+            }
+
+            //Count Pins Needed to Display
+            for(int chq = 0; chq < 4; chq++)
+            {
+                if (colPins[chq] == 2)
+                {
+                    ++red;
+                }
+
+                else if (colPins[chq] == 1)
+                {
+                    ++white;
+                }
+            }
+
+            //Display Dots
+            for (int ro = minRow; ro < maxRow; ro++)
+            {
+                for (int col = 0; col < 2; col++)
+                {
+                    Image change;
+                    change = new Image();
+                    GrdCorrectDisplay.Children.Add(change);
+
+                    if(red > 0)
+                    {
+                        change.Source = "Images/RedDot.png";
+                        red--;
+                    }
+                    else if (white > 0)
+                    {
+                        change.Source = "Images/WhiteDot.png";
+                        white--;
+                    }
+                    
+                    change.SetValue(Grid.RowProperty, ro);
+                    change.SetValue(Grid.ColumnProperty, col);
+                }
+            }
+            
+            //Update Round Counter
+            round++;
+        }
+
+        #endregion
+
+        #region NewGame
+        private void BtnNewGame_Clicked(object sender, EventArgs e)
+        {
+            NewGame();  
+        }
+
+        private void NewGame()
+        {
+            //Declare Variables
+            randAns = new Random();
+
+            for(int index = 0; index < 4; index++)
+            {
+                answerCode[index] = randAns.Next(1, 9);
+            }
+        }
+        #endregion
+
+        #region SaveGame
+        private void BtnSaveGame_Clicked(object sender, EventArgs e)
+        {
+
+        }
+        #endregion
+
+        #region LoadGame
+        private void BtnLoadGame_Clicked(object sender, EventArgs e)
+        {
+
+        }
+        #endregion
+
+        #region EndOfGame
+        private void WinGame()
+        {
+            DisplayAlert("Game Over!", "Congratulations you have Won the game!", "Start New Game");
+            NewGame();
+        }
+
+        private void LoseGame()
+        {
+            DisplayAlert("Game Over!", "Sorry you lose!!\nBetter Luck Next Time", "New Game");
+            NewGame();
         }
         #endregion
     }

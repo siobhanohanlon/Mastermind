@@ -2,34 +2,33 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Mastermind.MainPage">
-
-        <!-- Area for Board -->
     <StackLayout Orientation="Vertical" HorizontalOptions="Center" VerticalOptions="Center">
-        
-        <!-- Gameboard -->
+
+        <!-- Title -->
         <StackLayout Orientation="Horizontal" BackgroundColor="#d5e1df" Padding="20" HorizontalOptions="FillAndExpand">
-            <Label Text="Play Mastermind" HorizontalTextAlignment="Center" 
-                   TextColor="Black" FontSize="Medium"/>
+            <Label Text="Play Mastermind" HorizontalTextAlignment="Center"  HorizontalOptions="Center"
+                   TextColor="Black" FontSize="Medium" FontAttributes="Bold"/>
         </StackLayout>
 
+        <!--  GameBoard -->
         <!--  Grid for the game board background -->
         <Grid BackgroundColor="#C23E21" HeightRequest="800" WidthRequest="350" 
               HorizontalOptions="Center" VerticalOptions="Center">
-            
+
             <!--  Grid for the game board-->
             <Grid BackgroundColor="#E5694F" Margin="10" Grid.Row="0" 
                   Grid.Column="0" Grid.ColumnSpan="7" Grid.RowSpan="15">
 
                 <!--  Grid for the game board layout -->
                 <Grid x:Name="GrdGameLayout" Grid.Row="0" Grid.Column="0"
-                  Grid.ColumnSpan="3" Grid.RowSpan="13"/>
+                  Grid.ColumnSpan="3" Grid.RowSpan="15"/>
             </Grid>
 
-        <!-- Correct Display Area -->
+            <!-- Correct Display Area -->
             <Grid x:Name="GrdCorrectDisplay" Grid.Row="1" Grid.Column="5"
                   Grid.ColumnSpan="1" Grid.RowSpan="10" ColumnSpacing="0"
                   RowSpacing="0">
-                
+
                 <!-- Column -->
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="14"/>
@@ -38,43 +37,43 @@
 
                 <!-- Row -->
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="10"/>
+                    <RowDefinition Height="14"/>
+                    <RowDefinition Height="14"/>
+
                     <RowDefinition Height="14"/>
                     <RowDefinition Height="14"/>
                     <RowDefinition Height="14"/>
 
-                    <RowDefinition Height="16"/>
                     <RowDefinition Height="14"/>
-                    <RowDefinition Height="14"/>
-
-                    <RowDefinition Height="16"/>
                     <RowDefinition Height="14"/>
                     <RowDefinition Height="14"/>
 
-                    <RowDefinition Height="18"/>
                     <RowDefinition Height="14"/>
-                    <RowDefinition Height="14"/>
-
-                    <RowDefinition Height="18"/>
                     <RowDefinition Height="14"/>
                     <RowDefinition Height="14"/>
 
-                    <RowDefinition Height="16"/>
+                    <RowDefinition Height="15"/>
                     <RowDefinition Height="14"/>
                     <RowDefinition Height="14"/>
 
-                    <RowDefinition Height="18"/>
                     <RowDefinition Height="14"/>
-                    <RowDefinition Height="14"/>
-
-                    <RowDefinition Height="16"/>
                     <RowDefinition Height="14"/>
                     <RowDefinition Height="14"/>
 
-                    <RowDefinition Height="16"/>
+                    <RowDefinition Height="14"/>
                     <RowDefinition Height="14"/>
                     <RowDefinition Height="14"/>
 
-                    <RowDefinition Height="18"/>
+                    <RowDefinition Height="14"/>
+                    <RowDefinition Height="14"/>
+                    <RowDefinition Height="14"/>
+
+                    <RowDefinition Height="14"/>
+                    <RowDefinition Height="14"/>
+                    <RowDefinition Height="14"/>
+
+                    <RowDefinition Height="14"/>
                     <RowDefinition Height="14"/>
                     <RowDefinition Height="14"/>
                 </Grid.RowDefinitions>
