@@ -136,9 +136,9 @@
     <Content Include="Images\Empty.png" />
     <Content Include="Images\GreenDot.png" />
     <Content Include="Images\OrangeDot.png" />
+    <Content Include="Images\PurpleDot.png" />
     <Content Include="Images\QuestionMark.png" />
     <Content Include="Images\RedDot.png" />
-    <Content Include="Images\TanDot.png" />
     <Content Include="Images\WhiteDot.png" />
     <Content Include="Images\YellowDot.png" />
     <Content Include="Properties\Default.rd.xml" />

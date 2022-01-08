@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,11 +11,31 @@ namespace Mastermind
 {
     public partial class MainPage : ContentPage
     {
+        private SaveGame saveData = new SaveGame();
+
         #region GlobalVariables
         //Constants
         private const int NUM_ROW = 11, NUM_COL = 4; //Guess Area
         private const int COR_ROW = 30, COR_COL = 2; //Correct Display
         private const int NUM_ROUNDS = 11; //As Starting Round is 1, Actual #Rounds is 10
+        
+        #region Instructions Constant
+        private const string instructions= 
+            "-The Computer picks a random sequence of 4 colours\n" +
+            "-The Objective is to guess the sequence correctly in 10 turns\n" +
+            "-To select a colour just tap it and then select anywhere on the current row, " +
+            "(this row will be a lighter shade)\n" +
+            "-You are able to change an already selected colour if it is this that round, " +
+            "you can do this the same as picking a colour at first\n" +
+            "-After filling a line with your guesses, click 'Check Guess' Button\n" +
+            "-Pins will show up at the side for each correct guess\n" +
+            "\t-Red: Correct Colour and Correct Position\n" +
+            "\t-White: Correct Colour but Wrong Position\n" +
+            "\t-None: All Colours are Wrong\n\n" +
+            "To Win: Use the pins at the side to help you figure out the sequence " +
+            "in 10 goes, if you run out of goes.....You Lose! and Start a New Game\n\n\n" +
+            "GoodLuck!\n\n";
+        #endregion
 
         //BoxView
         BoxView currPinSelected;
@@ -23,24 +44,21 @@ namespace Mastermind
         Random randAns;
 
         //Global Variables
-        private int round;
-        private int currRow;
+        private int round, currRow, pinDisRow;
         private Color guessAreaColour = Color.SaddleBrown;
 
         //Array for Colours
         private static string[] ColourNames = {"Red", "Green", "Blue", "Black",
                                                "White", "Purple", "Yellow", "Orange"};
 
-        Color[] pinColours = new Color[8]
+        private Color[] pinColours = new Color[8]
             {Color.Red, Color.Green, Color.Blue, Color.Black,
             Color.White, Color.Purple, Color.Yellow, Color.Orange};
 
-        int[] answerCode = new int[4];
-        int[] userGuess = new int[4];
+        private int[] answerCode = new int[4];
+        private int[] userGuess = new int[4];
 
-        int[] colPins = new int[4];
-        int[] redPins = new int[40];
-        int[] whitePins = new int[40];
+        private int[] colPins = new int[4];
         #endregion
 
         //Main
@@ -48,7 +66,6 @@ namespace Mastermind
         {
             InitializeComponent();
             SetUpBoard();
-            NewGame();
         }
 
         //Set Up Board
@@ -56,7 +73,6 @@ namespace Mastermind
         {
             //Declare Variables
             Image guessSelect;
-            round = 1;
 
             #region SetUpGameLayout
             //Set up 4 Columns and 10 Rows to Grid in Xaml
@@ -72,21 +88,10 @@ namespace Mastermind
             #endregion
 
             #region SetUpAnswerArea
-            for (int a = 0; a < 4; a++)
-            {
-                //Create Image
-                Image answer;
-                answer = new Image();
-                answer.Source = "Images/QuestionMark.png";
-                answer.StyleId = "A" + a;
-                answer.SetValue(Grid.RowProperty, 0);
-                answer.SetValue(Grid.ColumnProperty, a);
-                answer.HeightRequest = 40;
-                answer.WidthRequest = 40;
-
-                //Add to Children
-                GrdGameLayout.Children.Add(answer);
-            }
+            Answer1.Source = "Images/QuestionMark.png";
+            Answer2.Source = "Images/QuestionMark.png";
+            Answer3.Source = "Images/QuestionMark.png";
+            Answer4.Source = "Images/QuestionMark.png";
             #endregion
 
             #region SetUpGuessArea
@@ -170,7 +175,7 @@ namespace Mastermind
                 GrdCorrectDisplay.ColumnDefinitions.Add(new ColumnDefinition());
             }
             //Row
-            for (int i = 0; i < 30; i++)
+            for (int i = 0; i < 33; i++)
             {
                 //New Row Definitions
                 GrdCorrectDisplay.RowDefinitions.Add(new RowDefinition());
@@ -190,18 +195,39 @@ namespace Mastermind
                         guessSelect = new Image();
                         guessSelect.Source = "Images/Empty.png";
 
-                        //Will be used to change later
-                        guessSelect.StyleId = r + "" + c;
-
                         //Set Value
                         guessSelect.SetValue(Grid.RowProperty, r);
                         guessSelect.SetValue(Grid.ColumnProperty, c);
 
+
                         //Add to Children
                         GrdCorrectDisplay.Children.Add(guessSelect);
+
+                        //Create Boxviews for Pins
+                        BoxView change;
+                        change = new BoxView();
+                        change.CornerRadius = 100;
+                        change.Scale = .75;
+                        GrdCorrectDisplay.Children.Add(change);
+                        change.SetValue(Grid.RowProperty, r);
+                        change.SetValue(Grid.ColumnProperty, c);
                     }
                 }
             }
+            #endregion
+
+            #region CreateHowToButton
+            Button BtnInstructions;
+            BtnInstructions = new Button();
+            BtnInstructions.Text = "Click to Read How To Play";
+            BtnInstructions.SetValue(Grid.RowProperty, 14);
+            BtnInstructions.SetValue(Grid.ColumnProperty, 0);
+            BtnInstructions.SetValue(Grid.ColumnSpanProperty, 6);
+            BtnInstructions.HorizontalOptions = LayoutOptions.Center;
+            BtnInstructions.VerticalOptions = LayoutOptions.Center;
+            BtnInstructions.Clicked += BtnHowTo_Clicked;
+            GrdGameLayout.Children.Add(BtnInstructions);
+
             #endregion
 
             #region CreateCheckButton
@@ -234,7 +260,7 @@ namespace Mastermind
             #region CreateSaveButton
             Button BtnSaveGame;
             BtnSaveGame = new Button();
-            BtnSaveGame.Text = "Load Game";
+            BtnSaveGame.Text = "Save Game";
             BtnSaveGame.SetValue(Grid.RowProperty, 15);
             BtnSaveGame.SetValue(Grid.ColumnProperty, 2);
             BtnSaveGame.SetValue(Grid.ColumnSpanProperty, 2);
@@ -247,7 +273,7 @@ namespace Mastermind
             #region CreateLoadButton
             Button BtnLoadGame;
             BtnLoadGame = new Button();
-            BtnLoadGame.Text = "Save Game";
+            BtnLoadGame.Text = "Load Game";
             BtnLoadGame.SetValue(Grid.RowProperty, 15);
             BtnLoadGame.SetValue(Grid.ColumnProperty, 4);
             BtnLoadGame.SetValue(Grid.ColumnSpanProperty, 2);
@@ -259,9 +285,36 @@ namespace Mastermind
 
             //Clear Selected
             currPinSelected = null;
+
+            DisplayAlert("Welcome to MasterMind", "Start Row will be lighter for you.\n\nGoodluck!","Lets Play");
+
+            //Start Game
+            NewGame();
         }
 
-        //Colour Pins Tapped
+        #region HighlightCurrentRow
+        private void HighlightRow(int currRow)
+        {
+            foreach(var cur in GrdGameLayout.Children)
+            {
+                if (cur.GetType() == typeof(BoxView))
+                {
+                    if ((int)cur.GetValue(Grid.RowProperty) == currRow &&
+                        (int)cur.GetValue(Grid.RowProperty) < 11 &&
+                        (int)cur.GetValue(Grid.RowProperty) > 1)
+                    {
+                        ((BoxView)cur).Opacity = 0.45;
+                    }
+
+                    else
+                    {
+                        ((BoxView)cur).Opacity = 1;
+                    }
+                }
+            }
+        }
+        #endregion
+
         #region ColourPinTapped
         private void PinTapped(object sender, EventArgs e)
         {
@@ -329,12 +382,13 @@ namespace Mastermind
 
             placePin.GestureRecognizers.Add(pinTap);
 
-            GrdGameLayout.Children.Add(placePin);
 
             if (destRow == (NUM_ROUNDS - round))
             {
                 placePin.SetValue(Grid.RowProperty, destRow);
                 placePin.SetValue(Grid.ColumnProperty, destCol);
+
+                GrdGameLayout.Children.Add(placePin);
 
                 GrdGameLayout.Children.Remove(currSq);
 
@@ -523,7 +577,21 @@ namespace Mastermind
                     }
                 }
                 #endregion
+
+                #region SaveAllUserGuessToArray
+                for(int all = 0; all < 4; all++)
+                {
+                    SaveGame.pastGuess[(currRow - 1), all] = userGuess[all];
+                }
+                #endregion
             }
+        }
+        #endregion
+
+        #region HowToButton
+        private void BtnHowTo_Clicked(object sender, EventArgs e)
+        {
+            DisplayAlert("MasterMind How to Play", instructions,"Back to Game");
         }
         #endregion
 
@@ -531,8 +599,6 @@ namespace Mastermind
         //Check if answer is Correct
         private void BtnCheckGuess_Clicked(object sender, EventArgs e)
         {
-            currRow = NUM_ROW - round;
-
             //Check if Guess Row is Full before checking
             if (!CheckCurrRow())
             {
@@ -544,6 +610,7 @@ namespace Mastermind
             //Check User Guess Against Answer
             else
             {
+                pinDisRow = (currRow * 3) - 2;
                 CheckUserGuess(currRow);
             }
         }
@@ -585,7 +652,8 @@ namespace Mastermind
             //White = 1, Red = 2
             //MinRow - start, MaxRow - Finish
             int minRow = 0, maxRow = 0;
-            int red = 0, white = 0;
+            int red = 0, white = 0, win = 0;
+            int duplicate = 0, found = 1;
 
             switch (currRow)
             {
@@ -634,32 +702,63 @@ namespace Mastermind
                     break;
             }
 
+            //Check for Duplcates in Answer Code
+            for(int dup1 = 0; dup1 < 4; dup1++)
+            {
+                for(int dup2 = 0; dup2 < 4; dup2++)
+                {
+                    if(answerCode[dup1].Equals(userGuess[dup2]) && found > 0)
+                    {
+                        ++duplicate;
+
+                        found = -1;
+                    }
+                }
+
+                found = 1;
+            }
+
             for (int check = 0; check < 4; check++)
             {
                 int index = Array.IndexOf(answerCode, userGuess[check]);
 
-                //If User Colour is Correct
-                if (index > -1)
+                //Correct Colour and Place
+                if (answerCode[check].Equals(userGuess[check]))
                 {
-                    //Correct Colour and Place
-                    if (answerCode[check].Equals(userGuess[check]))
-                    {
-                        colPins[check] = 2;//Red
-                    }
-                    else
+                    colPins[check] = 2;//Red
+
+                    --white;
+                    --duplicate;
+
+                    index = -1;
+                    
+                }
+
+                //If User Colour is Correct
+                else
+                {
+                    if (index > -1 && duplicate > 0 && red < duplicate)
                     {
                         //Correct Colour
                         colPins[check] = 1;//White
-                    }                    
+
+                        --duplicate;
+                    }
+
+                    else
+                    {
+                        colPins[check] = 0;//Clear
+                    }
                 }
             }
 
             //Count Pins Needed to Display
-            for(int chq = 0; chq < 4; chq++)
+            for (int chq = 0; chq < 4; chq++)
             {
                 if (colPins[chq] == 2)
                 {
                     ++red;
+                    ++win;
                 }
 
                 else if (colPins[chq] == 1)
@@ -673,30 +772,43 @@ namespace Mastermind
             {
                 for (int col = 0; col < 2; col++)
                 {
-                    Image change;
-                    change = new Image();
-                    GrdCorrectDisplay.Children.Add(change);
-
-                    if(red > 0)
+                    foreach (var change in GrdCorrectDisplay.Children)
                     {
-                        change.Source = "Images/RedDot.png";
-                        red--;
+                        if (change.GetType() == typeof(BoxView))
+                        {
+                            if((int)change.GetValue(Grid.RowProperty) == (pinDisRow + col))
+                            {
+                                if (red > 0)
+                                {
+                                    ((BoxView)change).Color = Color.Red;
+                                    red--;
+                                }
+                                else if (white > 0)
+                                {
+                                    ((BoxView)change).Color = Color.White;
+                                    white--;
+                                }
+                            }
+                        }
                     }
-                    else if (white > 0)
-                    {
-                        change.Source = "Images/WhiteDot.png";
-                        white--;
-                    }
-                    
-                    change.SetValue(Grid.RowProperty, ro);
-                    change.SetValue(Grid.ColumnProperty, col);
                 }
             }
-            
+
+            DisplayAnswer();
+
             //Update Round Counter
             round++;
-        }
 
+            //If User Won
+            if (win == 4 || round == NUM_ROUNDS)
+            {
+                EndOfGame(win);
+            }
+
+            //Update Row highlighted
+            currRow = NUM_ROW - round;
+            HighlightRow(currRow);
+        }
         #endregion
 
         #region NewGame
@@ -709,39 +821,233 @@ namespace Mastermind
         {
             //Declare Variables
             randAns = new Random();
+            round = 1;
+            currRow = 10;
 
-            for(int index = 0; index < 4; index++)
+            for (int index = 0; index < 4; index++)
             {
                 answerCode[index] = randAns.Next(1, 9);
             }
+
+            //Reset Answer Area
+            Answer1.Source = "Images/QuestionMark.png";
+            Answer2.Source = "Images/QuestionMark.png";
+            Answer3.Source = "Images/QuestionMark.png";
+            Answer4.Source = "Images/QuestionMark.png";
+
+            foreach (var item in GrdGameLayout.Children)
+            {
+                if (item.GetType() == typeof(BoxView))
+                {
+                    if ((int)((BoxView)item).GetValue(Grid.RowProperty) < 11)
+                    {
+                        ((BoxView)item).Color = guessAreaColour;
+                    }
+                }
+            }
+
+            foreach (var item in GrdCorrectDisplay.Children)
+            {
+                if (item.GetType() == typeof(BoxView))
+                {
+                    ((BoxView)item).Color = Color.Transparent;
+                }
+            }
+
+            //Highlight Row
+            HighlightRow(currRow);
         }
         #endregion
 
         #region SaveGame
         private void BtnSaveGame_Clicked(object sender, EventArgs e)
         {
+            //Create File Variables
+            string fullFileName, path;
 
+            //Assign variables
+            path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            fullFileName = Path.Combine(path, "SaveGameData.Txt");
+
+            SaveGame.WriteToFile(fullFileName, path);
+
+            if (File.Exists(fullFileName) == true)
+            {
+
+                DisplayAlert("Saved!", "Game Has been Saved", "Okay");
+            }
+
+            else
+            {
+
+                DisplayAlert("Error!", "Game Has not been Saved", "Okay");
+            }
         }
         #endregion
 
         #region LoadGame
         private void BtnLoadGame_Clicked(object sender, EventArgs e)
         {
+            string readText;
+            string path, fullFileName;
+
+            path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+            fullFileName = Path.Combine(path, "SaveGamedata.txt");
+
+            readText = SaveGame.ReadFromFile(path, fullFileName);
+
+            DisplayAlert("hello", readText,"ok");
 
         }
         #endregion
 
         #region EndOfGame
-        private void WinGame()
+        private void EndOfGame(int win)
         {
-            DisplayAlert("Game Over!", "Congratulations you have Won the game!", "Start New Game");
-            NewGame();
+            //Display Answer
+            DisplayAnswer();
+
+            //Winner
+            if(win == 4)
+            {
+                DisplayAlert("Game Over!", "Congratulations you have Won the game!", "Start New Game");
+                NewGame();
+            }
+
+            //Loser
+            else
+            {
+                DisplayAlert("Game Over!", "Sorry you lose!!\nBetter Luck Next Time", "New Game");
+                NewGame();
+            }
         }
 
-        private void LoseGame()
+        private void DisplayAnswer()
         {
-            DisplayAlert("Game Over!", "Sorry you lose!!\nBetter Luck Next Time", "New Game");
-            NewGame();
+            switch (answerCode[0])
+                {
+                    case 1:
+                        Answer1.Source = "Images/RedDot.png";
+                        break;
+                    case 2:
+                        Answer1.Source = "Images/GreenDot.png";
+                        break;
+                    case 3:
+                        Answer1.Source = "Images/BlueDot.png";
+                        break;
+                    case 4:
+                        Answer1.Source = "Images/BlackDot.png";
+                        break;
+                    case 5:
+                        Answer1.Source = "Images/WhiteDot.png";
+                        break;
+                    case 6:
+                        Answer1.Source = "Images/PurpleDot.png";
+                        break;
+                    case 7:
+                        Answer1.Source = "Images/YellowDot.png";
+                        break;
+                    case 8:
+                        Answer1.Source = "Images/OrangeDot.png";
+                        break;
+
+                    default:
+                        break;
+                }
+
+            switch (answerCode[1])
+            {
+                case 1:
+                    Answer2.Source = "Images/RedDot.png";
+                    break;
+                case 2:
+                    Answer2.Source = "Images/GreenDot.png";
+                    break;
+                case 3:
+                    Answer2.Source = "Images/BlueDot.png";
+                    break;
+                case 4:
+                    Answer2.Source = "Images/BlackDot.png";
+                    break;
+                case 5:
+                    Answer2.Source = "Images/WhiteDot.png";
+                    break;
+                case 6:
+                    Answer2.Source = "Images/PurpleDot.png";
+                    break;
+                case 7:
+                    Answer2.Source = "Images/YellowDot.png";
+                    break;
+                case 8:
+                    Answer2.Source = "Images/OrangeDot.png";
+                    break;
+
+                default:
+                    break;
+            }
+
+            switch (answerCode[2])
+            {
+                case 1:
+                    Answer3.Source = "Images/RedDot.png";
+                    break;
+                case 2:
+                    Answer3.Source = "Images/GreenDot.png";
+                    break;
+                case 3:
+                    Answer3.Source = "Images/BlueDot.png";
+                    break;
+                case 4:
+                    Answer3.Source = "Images/BlackDot.png";
+                    break;
+                case 5:
+                    Answer3.Source = "Images/WhiteDot.png";
+                    break;
+                case 6:
+                    Answer3.Source = "Images/PurpleDot.png";
+                    break;
+                case 7:
+                    Answer3.Source = "Images/YellowDot.png";
+                    break;
+                case 8:
+                    Answer3.Source = "Images/OrangeDot.png";
+                    break;
+
+                default:
+                    break;
+            }
+
+            switch (answerCode[3])
+            {
+                case 1:
+                    Answer4.Source = "Images/RedDot.png";
+                    break;
+                case 2:
+                    Answer4.Source = "Images/GreenDot.png";
+                    break;
+                case 3:
+                    Answer4.Source = "Images/BlueDot.png";
+                    break;
+                case 4:
+                    Answer4.Source = "Images/BlackDot.png";
+                    break;
+                case 5:
+                    Answer4.Source = "Images/WhiteDot.png";
+                    break;
+                case 6:
+                    Answer4.Source = "Images/PurpleDot.png";
+                    break;
+                case 7:
+                    Answer4.Source = "Images/YellowDot.png";
+                    break;
+                case 8:
+                    Answer4.Source = "Images/OrangeDot.png";
+                    break;
+
+                default:
+                    break;
+            }
         }
         #endregion
     }

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -92,5 +92,17 @@
       <Name>Mastermind</Name>
     </ProjectReference>
   </ItemGroup>
- <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
+  <ItemGroup>
+    <Content Include="Images\BlackDot.png" />
+    <Content Include="Images\BlueDot.png" />
+    <Content Include="Images\Empty.png" />
+    <Content Include="Images\GreenDot.png" />
+    <Content Include="Images\OrangeDot.png" />
+    <Content Include="Images\PurpleDot.png" />
+    <Content Include="Images\QuestionMark.png" />
+    <Content Include="Images\RedDot.png" />
+    <Content Include="Images\WhiteDot.png" />
+    <Content Include="Images\YellowDot.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />
 </Project>
