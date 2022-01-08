@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Newtonsoft.Json;
 using System.Text;
 
 namespace Mastermind
@@ -8,51 +9,22 @@ namespace Mastermind
     public class SaveGame
     {
         //Declare Variables
-        public static int round;
-        public static int[,] correctPins = new int[10, 2];
-        public static int[,] pastGuess = new int[10,4];
+        public int round;
+        public int[,] pastGuess;
 
-        public static void WriteToFile(string fullFileName, string path)
+        //If no data to save
+        public SaveGame()
         {
-            using (var writer = File.Create(path))
+            round = 0;
+            pastGuess = new int[10, 4];
+
+            for (int i = 0; i < pastGuess.GetLength(0); i++)
             {
-                for(int i = 0; i < pastGuess.GetLength(0); i++)
+                for (int j = 0; j < pastGuess.GetLength(1); j++)
                 {
-                    for(int j = 0; j < pastGuess.GetLength(1); j++)
-                    {
-                        //Write to File
-                        writer.Write(pastGuess[i,j]);
-                    }
+                    pastGuess[i, j] = -1;
                 }
             }
-        }
-    
-        public static string ReadFromFile(string fullFileName, string path)
-        {
-            string readText = "";
-
-            try
-            {
-                using (var reader = new StreamReader(fullFileName))
-                {
-                    for (int i = 0; i < pastGuess.GetLength(0); i++)
-                    {
-                        for (int j = 0; j < pastGuess.GetLength(1); j++)
-                        {
-                            //Write to File
-                            pastGuess[i, j] = reader.ReadLine;
-                        }
-                    }
-                    readText = reader.ReadToEnd();
-                }
-            }
-
-            catch
-            {
-                readText = "Couldn't read the file!! Check if file exosts";
-            }
-
-            return readText;
         }
     }
 }
