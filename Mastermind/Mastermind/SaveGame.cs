@@ -9,14 +9,15 @@ namespace Mastermind
     public class SaveGame
     {
         //Declare Variables
-        public int round;
+        public int round, corPinRow;
         public int[,] pastGuess;
         public int[] answerCode;
 
         //If no data to save
         public SaveGame()
         {
-            round = 0;
+            round = 0; 
+            corPinRow = 0;
             pastGuess = new int[10, 4];
             answerCode = new int[4] { 0,0,0,0};
 

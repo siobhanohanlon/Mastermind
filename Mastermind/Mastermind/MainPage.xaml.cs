@@ -47,6 +47,7 @@ namespace Mastermind
         //Global Variables
         private int round, currRow, pinDisRow, r;
         private readonly Color guessAreaColour = Color.SaddleBrown;
+        private bool load;
 
         //Array for Colours
         private static readonly string[] ColourNames = {"Red", "Green", "Blue", "Black",
@@ -799,11 +800,6 @@ namespace Mastermind
             //Declare Variables
             int red = 0, white = 0, win = 0;
 
-
-            DisplayAlert("h", colPins[0].ToString() + " " +
-                colPins[1].ToString() + " " +
-                colPins[2].ToString() + " " +
-                colPins[3].ToString(), "k");
             //Count Pins Needed to Display
             for (int chq = 0; chq < 4; chq++)
             {
@@ -875,8 +871,12 @@ namespace Mastermind
             {
                 FindCurrentRow();
                 pinDisRow = (currRow * 3) - 2;
+                saveData.corPinRow = pinDisRow;
                 CheckUserGuess();
-
+                UpdateRound();
+                saveData.round = round;
+                FindCurrentRow();
+                HighlightRow(currRow);
                 DisplayAnswer();
             }
         }
@@ -917,6 +917,7 @@ namespace Mastermind
             //Declare Variables
             //MinRow - start, MaxRow - Finish
             int win, ansDup = 0, userDup = 0, index;
+            int red = 0, white = 0;
             bool redFound, found;
 
             FindCurrentRow();
@@ -965,7 +966,8 @@ namespace Mastermind
                 if (answerCode[check].Equals(userGuess[check]))
                 {
                     colPins[check] = 2;//Red
-                            
+
+                    red++;
                     redFound = true;
                 }
                     
@@ -977,25 +979,31 @@ namespace Mastermind
                     {
                         //Correct Colour
                         colPins[check] = 1;//White
+                        white++;
                     }
                     else
                     {
                         colPins[check] = 0;//Clear
                     }
                 }
-
-                //Duplicates Get rid
-                if(userDup > ansDup)
-                {
-                    colPins[check] = 0;
-                    userDup--;
-                }
             }
 
+            //Duplicates Get rid
+            for(int i = 0; i < 4; i++)
+            {
+                if (userDup >= ansDup && ansDup > -1)
+                {
+                    if (red <= white && colPins[i] == 1)
+                    {
+                        if(white != 0 && red != 0)
+                        {
+                            colPins[i] = 0;
+                        }
+                    }
+                }
+            }
+            
             win = PlaceCorrectPins();
-
-            //Update Round Counter
-            UpdateRound();
 
             //If User Won
             if (win == 4 || round == NUM_ROUNDS)
@@ -1008,9 +1016,6 @@ namespace Mastermind
 
             //Update Saved Round
             saveData.round = round-1;
-            
-            //Update Highlight Row
-            HighlightRow(currRow);
         }
 
         private void UpdateRound()
@@ -1099,6 +1104,7 @@ namespace Mastermind
             string fullFileName, path, text;
 
             saveData.round = round;
+            saveData.corPinRow = pinDisRow;
 
             //Assign variables
             path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -1118,7 +1124,7 @@ namespace Mastermind
             DisplayAlert("Loading......", "Game is Loading\nPlease wait.", "Close");
 
             string fullFileName, path, text;
-            int rnd;
+            int rnd, thisRow;
 
             //Assign variables
             path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -1126,17 +1132,21 @@ namespace Mastermind
 
             if (File.Exists(fullFileName) == true)
             {
+                load = true;
                 text = File.ReadAllText(fullFileName);
                 saveData = JsonConvert.DeserializeObject<SaveGame>(text);
 
                 //Variables
                 round = saveData.round;
                 rnd = saveData.round;
-                int userG, row, rowsUsed = 10;
+                pinDisRow = saveData.corPinRow;
+                thisRow = saveData.corPinRow;
+                int userG, row, rowsUsed = 10, corRUsed = 30, cor;
                 row = NUM_ROW - rnd;
+                cor = COR_COL - thisRow;
 
                 //Load Answer Code
-                for(int l = 0; l < 4; l++)
+                for (int l = 0; l < 4; l++)
                 {
                     answerCode[l] = saveData.answerCode[l];
                 }
@@ -1153,20 +1163,24 @@ namespace Mastermind
                             PlacePins(userG, rowsUsed, j);
                         }
 
-                        CheckUserGuess();
+                        if (thisRow > 0 && corRUsed >= cor)
+                        {
+                            CheckUserGuess();
+                        }
 
                         --rnd;
                         --rowsUsed;
+                        --thisRow;
+                        --corRUsed;
                     }
                 }
-
                 round = saveData.round;
-                DisplayAlert("h", round.ToString(), "k");
 
                 //Reset round Counter
                 FindCurrentRow();
 
                 HighlightRow(currRow);
+                load = false;
 
                 DisplayAlert("Game Loaded Successfully!", "Game Has been Loaded", "Close");
             }
