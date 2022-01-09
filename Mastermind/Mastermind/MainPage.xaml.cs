@@ -45,7 +45,7 @@ namespace Mastermind
         Random randAns;
 
         //Global Variables
-        private int round, currRow, pinDisRow;
+        private int round, currRow, pinDisRow, r;
         private Color guessAreaColour = Color.SaddleBrown;
 
         //Array for Colours
@@ -61,6 +61,7 @@ namespace Mastermind
         private int[] colPins = new int[4];
 
         public static int[,] pastGuess = new int[10,4];
+        public static int[,] corPins = new int[10,4];
         #endregion
 
         //Main
@@ -111,7 +112,6 @@ namespace Mastermind
                     BoxView emptyGuess;
                     emptyGuess = new BoxView();
                     emptyGuess.Color = guessAreaColour;
-                    emptyGuess.StyleId = "GuessArea";
                     emptyGuess.HorizontalOptions = LayoutOptions.Center;
                     emptyGuess.VerticalOptions = LayoutOptions.Center;
                     emptyGuess.HeightRequest = 40;
@@ -295,17 +295,41 @@ namespace Mastermind
         }
 
         #region HighlightCurrentRow
+        private void FindCurrentRow()
+        {
+            int findCR = NUM_ROW - round;
+
+            if(findCR > 0 && findCR < 11)
+            {
+                currRow = findCR;
+            }
+            else
+            {
+                currRow = -1;
+            }
+        }
+
         private void HighlightRow(int currRow)
         {
             foreach(var cur in GrdGameLayout.Children)
             {
                 if (cur.GetType() == typeof(BoxView))
                 {
+                    FindCurrentRow();
+
                     if ((int)cur.GetValue(Grid.RowProperty) == currRow &&
                         (int)cur.GetValue(Grid.RowProperty) < 11 &&
                         (int)cur.GetValue(Grid.RowProperty) > 1)
                     {
-                        ((BoxView)cur).Opacity = 0.45;
+                        if (((BoxView)cur).Color == guessAreaColour)
+                        {
+                            ((BoxView)cur).Opacity = 0.45;
+                        }
+
+                        else
+                        {
+                            ((BoxView)cur).Opacity = 1;
+                        }
                     }
 
                     else
@@ -344,7 +368,9 @@ namespace Mastermind
         //Select the Pin
         private void SelectThisColour(BoxView thisOne)
         {
-            if(currRow > 0 && currRow < 11)
+            FindCurrentRow();
+
+            if(currRow > 0)
             {
                 //This Piece is Selected
                 currPinSelected = thisOne;
@@ -392,7 +418,11 @@ namespace Mastermind
 
             placePin.GestureRecognizers.Add(pinTap);
 
-            if (destRow == (NUM_ROUNDS - round) && currRow != 0)
+            int rnd = (NUM_ROUNDS - round);
+
+            FindCurrentRow();
+
+            if (destRow == currRow && currRow > 0)
             {
                 placePin.SetValue(Grid.RowProperty, destRow);
                 placePin.SetValue(Grid.ColumnProperty, destCol);
@@ -406,242 +436,394 @@ namespace Mastermind
         }
         #endregion
 
+        #region PlacePins
         private void PlacePins(BoxView placePin) 
         {
-            #region SetPinToUserGuess
-            //Red
-            if (placePin.Color == Color.Red)
+            int row = (int)((BoxView)placePin).GetValue(Grid.RowProperty);
+            if(row == currRow)
             {
-                switch (placePin.GetValue(Grid.ColumnProperty))
+                #region SetPinToUserGuess
+                //Red
+                if (placePin.Color == Color.Red)
                 {
-                    case 0:
-                        userGuess[0] = 1;
-                        break;
-                    case 1:
-                        userGuess[1] = 1;
-                        break;
-                    case 2:
-                        userGuess[2] = 1;
-                        break;
-                    case 3:
-                        userGuess[3] = 1;
-                        break;
+                    switch (placePin.GetValue(Grid.ColumnProperty))
+                    {
+                        case 0:
+                            userGuess[0] = 1;
+                            break;
+                        case 1:
+                            userGuess[1] = 1;
+                            break;
+                        case 2:
+                            userGuess[2] = 1;
+                            break;
+                        case 3:
+                            userGuess[3] = 1;
+                            break;
 
-                    default:
-                        break;
+                        default:
+                            break;
+                    }
+                }
+
+                //Green
+                if (placePin.Color == Color.Green)
+                {
+                    switch (placePin.GetValue(Grid.ColumnProperty))
+                    {
+                        case 0:
+                            userGuess[0] = 2;
+                            break;
+                        case 1:
+                            userGuess[1] = 2;
+                            break;
+                        case 2:
+                            userGuess[2] = 2;
+                            break;
+                        case 3:
+                            userGuess[3] = 2;
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+
+                //Blue
+                if (placePin.Color == Color.Blue)
+                {
+                    switch (placePin.GetValue(Grid.ColumnProperty))
+                    {
+                        case 0:
+                            userGuess[0] = 3;
+                            break;
+                        case 1:
+                            userGuess[1] = 3;
+                            break;
+                        case 2:
+                            userGuess[2] = 3;
+                            break;
+                        case 3:
+                            userGuess[3] = 3;
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+
+                //Black
+                if (placePin.Color == Color.Black)
+                {
+                    switch (placePin.GetValue(Grid.ColumnProperty))
+                    {
+                        case 0:
+                            userGuess[0] = 4;
+                            break;
+                        case 1:
+                            userGuess[1] = 4;
+                            break;
+                        case 2:
+                            userGuess[2] = 4;
+                            break;
+                        case 3:
+                            userGuess[3] = 4;
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+
+                //White
+                if (placePin.Color == Color.White)
+                {
+                    switch (placePin.GetValue(Grid.ColumnProperty))
+                    {
+                        case 0:
+                            userGuess[0] = 5;
+                            break;
+                        case 1:
+                            userGuess[1] = 5;
+                            break;
+                        case 2:
+                            userGuess[2] = 5;
+                            break;
+                        case 3:
+                            userGuess[3] = 5;
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+
+                //Purple
+                if (placePin.Color == Color.Purple)
+                {
+                    switch (placePin.GetValue(Grid.ColumnProperty))
+                    {
+                        case 0:
+                            userGuess[0] = 6;
+                            break;
+                        case 1:
+                            userGuess[1] = 6;
+                            break;
+                        case 2:
+                            userGuess[2] = 6;
+                            break;
+                        case 3:
+                            userGuess[3] = 6;
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+
+                //Yellow
+                if (placePin.Color == Color.Yellow)
+                {
+                    switch (placePin.GetValue(Grid.ColumnProperty))
+                    {
+                        case 0:
+                            userGuess[0] = 7;
+                            break;
+                        case 1:
+                            userGuess[1] = 7;
+                            break;
+                        case 2:
+                            userGuess[2] = 7;
+                            break;
+                        case 3:
+                            userGuess[3] = 7;
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+
+                //Orange
+                if (placePin.Color == Color.Orange)
+                {
+                    switch (placePin.GetValue(Grid.ColumnProperty))
+                    {
+                        case 0:
+                            userGuess[0] = 8;
+                            break;
+                        case 1:
+                            userGuess[1] = 8;
+                            break;
+                        case 2:
+                            userGuess[2] = 8;
+                            break;
+                        case 3:
+                            userGuess[3] = 8;
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+                #endregion
+
+                //SaveAllUserGuessToArray
+                if (currRow > 0 && currRow < 11)
+                {
+                    for (int all = 0; all < 4; all++)
+                    {
+                        saveData.pastGuess[r, all] = userGuess[all];
+                    }
                 }
             }
-
-            //Green
-            if (placePin.Color == Color.Green)
-            {
-                switch (placePin.GetValue(Grid.ColumnProperty))
-                {
-                    case 0:
-                        userGuess[0] = 2;
-                        break;
-                    case 1:
-                        userGuess[1] = 2;
-                        break;
-                    case 2:
-                        userGuess[2] = 2;
-                        break;
-                    case 3:
-                        userGuess[3] = 2;
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-
-            //Blue
-            if (placePin.Color == Color.Blue)
-            {
-                switch (placePin.GetValue(Grid.ColumnProperty))
-                {
-                    case 0:
-                        userGuess[0] = 3;
-                        break;
-                    case 1:
-                        userGuess[1] = 3;
-                        break;
-                    case 2:
-                        userGuess[2] = 3;
-                        break;
-                    case 3:
-                        userGuess[3] = 3;
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-
-            //Black
-            if (placePin.Color == Color.Black)
-            {
-                switch (placePin.GetValue(Grid.ColumnProperty))
-                {
-                    case 0:
-                        userGuess[0] = 4;
-                        break;
-                    case 1:
-                        userGuess[1] = 4;
-                        break;
-                    case 2:
-                        userGuess[2] = 4;
-                        break;
-                    case 3:
-                        userGuess[3] = 4;
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-
-            //White
-            if (placePin.Color == Color.White)
-            {
-                switch (placePin.GetValue(Grid.ColumnProperty))
-                {
-                    case 0:
-                        userGuess[0] = 5;
-                        break;
-                    case 1:
-                        userGuess[1] = 5;
-                        break;
-                    case 2:
-                        userGuess[2] = 5;
-                        break;
-                    case 3:
-                        userGuess[3] = 5;
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-
-            //Purple
-            if (placePin.Color == Color.Purple)
-            {
-                switch (placePin.GetValue(Grid.ColumnProperty))
-                {
-                    case 0:
-                        userGuess[0] = 6;
-                        break;
-                    case 1:
-                        userGuess[1] = 6;
-                        break;
-                    case 2:
-                        userGuess[2] = 6;
-                        break;
-                    case 3:
-                        userGuess[3] = 6;
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-
-            //Yellow
-            if (placePin.Color == Color.Yellow)
-            {
-                switch (placePin.GetValue(Grid.ColumnProperty))
-                {
-                    case 0:
-                        userGuess[0] = 7;
-                        break;
-                    case 1:
-                        userGuess[1] = 7;
-                        break;
-                    case 2:
-                        userGuess[2] = 7;
-                        break;
-                    case 3:
-                        userGuess[3] = 7;
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-
-            //Orange
-            if (placePin.Color == Color.Orange)
-            {
-                switch (placePin.GetValue(Grid.ColumnProperty))
-                {
-                    case 0:
-                        userGuess[0] = 8;
-                        break;
-                    case 1:
-                        userGuess[1] = 8;
-                        break;
-                    case 2:
-                        userGuess[2] = 8;
-                        break;
-                    case 3:
-                        userGuess[3] = 8;
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-            #endregion
         }
 
-        private void PlacePins(int userGuess, int destRow, int destCol)
+        private void PlacePins(int guess, int destRow, int destCol)
         {
-            BoxView pin;
-            pin = new BoxView();
-            pin.StyleId = "SelectedPin";
-            pin.HorizontalOptions = LayoutOptions.Center;
-            pin.VerticalOptions = LayoutOptions.Center;
-            pin.HeightRequest = 40;
-            pin.WidthRequest = 40;
-            pin.CornerRadius = 40;
-            pin.SetValue(Grid.RowProperty, destRow);
-            pin.SetValue(Grid.ColumnProperty, destCol);
+            //Declare Variables
+            int boxRow, boxCol, colour; ;
 
-            GrdGameLayout.Children.Add(pin);
+            foreach (var sPin in GrdGameLayout.Children)
+            {
+                //If it is equal to the boxview
+                if (sPin.GetType() == typeof(BoxView))
+                {
+                    boxRow = (int)((BoxView)sPin).GetValue(Grid.RowProperty);
+                    boxCol = (int)((BoxView)sPin).GetValue(Grid.ColumnProperty);
 
-            switch (userGuess)
+                    if(boxRow > 0 && boxRow < 11)
+                    {
+                        if (boxRow == destRow && boxCol == destCol)
+                        {
+
+                            DisplayAlert("h", "BoxRow:"+boxRow.ToString() + "\tSaved Row:" + destRow.ToString() + "\n" +
+                               "BoxCol:" + boxCol.ToString() + "\tSavedRow:" +destCol.ToString() + "\n" + 
+                               "Colour:" +guess.ToString() +"Colour Array:"+pinColours[0].ToString(), "k");
+                            switch (guess)
+                            {
+                                case 1:
+                                    ((BoxView)sPin).Color = Color.Red;
+                                    colour = 1;
+                                    break;
+                                case 2:
+                                    ((BoxView)sPin).Color = pinColours[1];
+                                    colour = 2;
+                                    break;
+                                case 3:
+                                    ((BoxView)sPin).Color = pinColours[2];
+                                    colour = 3;
+                                    break;
+                                case 4:
+                                    ((BoxView)sPin).Color = pinColours[3];
+                                    colour = 4;
+                                    break;
+                                case 5:
+                                    ((BoxView)sPin).Color = pinColours[4];
+                                    colour = 5;
+                                    break;
+                                case 6:
+                                    ((BoxView)sPin).Color = pinColours[5];
+                                    colour = 6;
+                                    break;
+                                case 7:
+                                    ((BoxView)sPin).Color = pinColours[6];
+                                    colour = 7;
+                                    break;
+                                case 8:
+                                    ((BoxView)sPin).Color = pinColours[7];
+                                    colour = 8;
+                                    break;
+
+                                default:
+                                    ((BoxView)sPin).Color = guessAreaColour;
+                                    ((BoxView)sPin).StyleId = "GuessArea";
+                                    colour = 0;
+                                    break;
+                            }
+
+                            if (((BoxView)sPin).Color == guessAreaColour)
+                            {
+                                ((BoxView)sPin).Opacity = 0.45;
+                            }
+
+                            //Set User Guess to Current Row
+                            userGuess[destCol] = colour;
+
+                            DisplayAlert("h","UserGuessArray"+ userGuess[destCol].ToString(),"k");
+                        }
+                    }
+                }
+            }
+        }
+
+        private void PlaceCorrectPins()
+        {
+            int minRow, maxRow;
+
+            switch (currRow)
             {
                 case 1:
-                    pin.Color = pinColours[0];
+                    minRow = 1;
+                    maxRow = 3;
                     break;
                 case 2:
-                    pin.Color = pinColours[1];
+                    minRow = 4;
+                    maxRow = 6;
                     break;
                 case 3:
-                    pin.Color = pinColours[2];
+                    minRow = 7;
+                    maxRow = 9;
                     break;
                 case 4:
-                    pin.Color = pinColours[3];
+                    minRow = 10;
+                    maxRow = 12;
                     break;
                 case 5:
-                    pin.Color = pinColours[4];
+                    minRow = 13;
+                    maxRow = 15;
                     break;
                 case 6:
-                    pin.Color = pinColours[5];
+                    minRow = 16;
+                    maxRow = 18;
                     break;
                 case 7:
-                    pin.Color = pinColours[6];
+                    minRow = 19;
+                    maxRow = 21;
                     break;
                 case 8:
-                    pin.Color = pinColours[7];
+                    minRow = 22;
+                    maxRow = 24;
+                    break;
+                case 9:
+                    minRow = 25;
+                    maxRow = 27;
+                    break;
+                case 10:
+                    minRow = 28;
+                    maxRow = 30;
                     break;
 
                 default:
-                    pin.Color = guessAreaColour;
+                    minRow = 0;
+                    maxRow = 0;
                     break;
             }
+
+            PlaceCorrectPins(minRow, maxRow);
         }
+
+        private int PlaceCorrectPins(int minRow, int maxRow)
+        {
+            //Declare Variables
+            int red = 0, white = 0, win = 0;
+
+            //Count Pins Needed to Display
+            for (int chq = 0; chq < 4; chq++)
+            {
+                if (colPins[chq] == 2)
+                {
+                    ++red;
+                    ++win;
+                }
+
+                else if (colPins[chq] == 1)
+                {
+                    ++white;
+                }
+            }
+
+            //Display Dots
+            for (int ro = minRow; ro < maxRow; ro++)
+            {
+                for (int col = 0; col < 2; col++)
+                {
+                    foreach (var change in GrdCorrectDisplay.Children)
+                    {
+                        if (change.GetType() == typeof(BoxView))
+                        {
+                            if ((int)change.GetValue(Grid.RowProperty) == (pinDisRow + col))
+                            {
+                                if (red > 0)
+                                {
+                                    ((BoxView)change).Color = Color.Red;
+                                    red--;
+                                }
+                                else if (white > 0)
+                                {
+                                    ((BoxView)change).Color = Color.White;
+                                    white--;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            //Return
+            return win;
+        }
+        #endregion
 
         #region HowToButton
         private void BtnHowTo_Clicked(object sender, EventArgs e)
@@ -665,8 +847,11 @@ namespace Mastermind
             //Check User Guess Against Answer
             else
             {
+                currRow = NUM_ROW - round;
                 pinDisRow = (currRow * 3) - 2;
                 CheckUserGuess(currRow);
+
+                DisplayAnswer();
             }
         }
 
@@ -675,7 +860,7 @@ namespace Mastermind
         {
             //Declare Variables
             bool rowFull = true;
-            currRow = (NUM_ROW - round);
+            FindCurrentRow();
 
             foreach (var item in GrdGameLayout.Children)
             {
@@ -700,13 +885,12 @@ namespace Mastermind
         }
         #endregion
 
-        #region CheckUserGuessVsAnswer
+        #region Play
         private void CheckUserGuess(int currRow)
         {
             //Declare Variables
             //MinRow - start, MaxRow - Finish
-            int minRow = 0, maxRow = 0;
-            int red = 0, white = 0, win = 0, buffer = 0;
+            int minRow, maxRow, win, buffer = 0;
             int duplicate = 0, found = 1;
 
             switch (currRow)
@@ -753,6 +937,8 @@ namespace Mastermind
                     break;
 
                 default:
+                    minRow = 0;
+                    maxRow = 0;
                     break;
             }
 
@@ -809,81 +995,51 @@ namespace Mastermind
                 }
             }
 
-            //Count Pins Needed to Display
-            for (int chq = 0; chq < 4; chq++)
-            {
-                if (colPins[chq] == 2)
-                {
-                    ++red;
-                    ++win;
-                }
-
-                else if (colPins[chq] == 1)
-                {
-                    ++white;
-                }
-            }
-
-            //Display Dots
-            for (int ro = minRow; ro < maxRow; ro++)
-            {
-                for (int col = 0; col < 2; col++)
-                {
-                    foreach (var change in GrdCorrectDisplay.Children)
-                    {
-                        if (change.GetType() == typeof(BoxView))
-                        {
-                            if((int)change.GetValue(Grid.RowProperty) == (pinDisRow + col))
-                            {
-                                if (red > 0)
-                                {
-                                    ((BoxView)change).Color = Color.Red;
-                                    red--;
-                                }
-                                else if (white > 0)
-                                {
-                                    ((BoxView)change).Color = Color.White;
-                                    white--;
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            win = PlaceCorrectPins(minRow, maxRow);
 
             //Update Round Counter
-            round++;
+            UpdateRound();
 
             //If User Won
             if (win == 4 || round == NUM_ROUNDS)
             {
                 EndOfGame(win);
             }
-
-            //SaveAllUserGuessToArray
-            if(currRow > 0 && currRow < 11)
-            {
-                int r = round - 2;
-                for (int all = 0; all < 4; all++)
-                {
-                    saveData.pastGuess[r, all] = userGuess[all];
-                }
-            }
-            
+                        
             //Update Row highlighted
             currRow = NUM_ROW - round;
 
             //Update Saved Round
-            saveData.round = round;
+            saveData.round = round-1;
             
             //Update Highlight Row
             HighlightRow(currRow);
         }
+
+        private void UpdateRound()
+        {
+            round++;
+            r++;
+
+            //Clear Guess Array
+            for(int clear = 0; clear < 4; clear++)
+            {
+                userGuess[clear] = 0;
+            }
+        }
         #endregion
 
         #region NewGame
-        private void BtnNewGame_Clicked(object sender, EventArgs e)
+        private async void BtnNewGame_Clicked(object sender, EventArgs e)
         {
+            bool askRestart = await DisplayAlert("Start a New Game", "Are you sure you want to start a new game?", "Yes", "No");
+
+            if(askRestart == false)
+            {
+                return;
+            }
+
+            //Start a new game
             NewGame();  
         }
 
@@ -893,11 +1049,17 @@ namespace Mastermind
             randAns = new Random();
             currPinSelected = null;
             round = 1;
-            currRow = 10;
+            r = 0;
+
+            FindCurrentRow();
 
             for (int index = 0; index < 4; index++)
             {
                 answerCode[index] = randAns.Next(1, 9);
+                userGuess[index] = 0;
+
+                //Save Answer Code
+                saveData.answerCode[index] = answerCode[index];
             }
 
             //Reset Answer Area
@@ -927,6 +1089,7 @@ namespace Mastermind
             }
 
             //Highlight Row
+            FindCurrentRow();
             HighlightRow(currRow);
         }
         #endregion
@@ -948,34 +1111,61 @@ namespace Mastermind
             File.WriteAllText(fullFileName, text);
 
             await DisplayAlert("Saved!", "Game Has been Saved", "Okay");
-
         }
         #endregion
 
         #region LoadGame
         private void BtnLoadGame_Clicked(object sender, EventArgs e)
         {
-            if (File.Exists("SaveGameData.txt") == true)
-            {
-                DisplayAlert("Game Loaded Successfully!", "Game Has been Loaded", "Close");
+            DisplayAlert("Loading......", "Game is Loading\nPlease wait.", "Close");
 
+            string fullFileName, path, text;
+            int rnd;
+
+            //Assign variables
+            path = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            fullFileName = Path.Combine(path, "SaveGameData.txt");
+
+            if (File.Exists(fullFileName) == true)
+            {
+                text = File.ReadAllText(fullFileName);
+                saveData = JsonConvert.DeserializeObject<SaveGame>(text);
+
+                //Variables
                 round = saveData.round;
-                
-                for (int load = 0; load < saveData.pastGuess.GetLength(0); load--)
+                rnd = saveData.round;
+                int userG = 0, row = 0, rowsUsed = 10;
+                row = NUM_ROW - rnd;
+
+                //Load Answer Code
+                for(int l = 0; l < 4; l++)
                 {
-                    while (round > 0)
+                    answerCode[l] = saveData.answerCode[l];
+                }
+
+                for (int load = 0; load < saveData.pastGuess.GetLength(0); load++)
+                {
+                    FindCurrentRow();
+                    if (rnd > 0 && rowsUsed >= row)
                     {
-                        currRow = NUM_ROW - round;
-                        
                         for (int j = 0; j < pastGuess.GetLength(1); j++)
                         {
-                            userGuess[j] = saveData.pastGuess[load, j];
+                            userG = saveData.pastGuess[load, j];
 
-                            PlacePins(userGuess[j], currRow, j);
+                            PlacePins(userG, rowsUsed, j);
                         }
-                        --round;
+
+                        --rnd;
+                        --rowsUsed;
                     }
                 }
+
+                //Reset round Counter
+                FindCurrentRow();
+
+                HighlightRow(currRow);
+
+                DisplayAlert("Game Loaded Successfully!", "Game Has been Loaded", "Close");
             }
 
             else
@@ -999,7 +1189,6 @@ namespace Mastermind
             if(win == 4)
             {
                 DisplayAlert("Game Over!", "Congratulations you have Won the game!", "Look at Results");
-                HighlightRow(currRow);
             }
 
             //Loser
