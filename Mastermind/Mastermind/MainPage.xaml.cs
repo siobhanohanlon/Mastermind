@@ -46,19 +46,19 @@ namespace Mastermind
 
         //Global Variables
         private int round, currRow, pinDisRow, r;
-        private Color guessAreaColour = Color.SaddleBrown;
+        private readonly Color guessAreaColour = Color.SaddleBrown;
 
         //Array for Colours
-        private static string[] ColourNames = {"Red", "Green", "Blue", "Black",
+        private static readonly string[] ColourNames = {"Red", "Green", "Blue", "Black",
                                                "White", "Purple", "Yellow", "Orange"};
 
-        private Color[] pinColours = new Color[8]
+        private readonly Color[] pinColours = new Color[8]
             {Color.Red, Color.Green, Color.Blue, Color.Black,
             Color.White, Color.Purple, Color.Yellow, Color.Orange};
 
-        private int[] answerCode = new int[4];
-        private int[] userGuess = new int[4];
-        private int[] colPins = new int[4];
+        private readonly int[] answerCode = new int[4];
+        private readonly int[] userGuess = new int[4];
+        private readonly int[] colPins = new int[4];
 
         public static int[,] pastGuess = new int[10,4];
         public static int[,] corPins = new int[10,4];
@@ -109,14 +109,14 @@ namespace Mastermind
                 for (int c = 0; c < NUM_COL; c++)
                 {
                     //Create new BoxView
-                    BoxView emptyGuess;
-                    emptyGuess = new BoxView();
-                    emptyGuess.Color = guessAreaColour;
-                    emptyGuess.HorizontalOptions = LayoutOptions.Center;
-                    emptyGuess.VerticalOptions = LayoutOptions.Center;
-                    emptyGuess.HeightRequest = 40;
-                    emptyGuess.WidthRequest = 40;
-                    emptyGuess.CornerRadius = 40;
+                    BoxView emptyGuess = new BoxView() 
+                    {
+                        Color = guessAreaColour, 
+                        HorizontalOptions = LayoutOptions.Center,
+                        VerticalOptions = LayoutOptions.Center,
+                        HeightRequest = 40, WidthRequest = 40,
+                        CornerRadius = 40
+                    };
 
                     //Set Value
                     emptyGuess.SetValue(Grid.RowProperty, r);
@@ -145,15 +145,16 @@ namespace Mastermind
                 {
                     for(int co = 0; co < 4; co++)
                     {
-                        BoxView pin;
-                        pin = new BoxView();
-                        pin.Color = pinColours[h];
-                        pin.StyleId = ColourNames[h] + "Pin";
-                        pin.HorizontalOptions = LayoutOptions.Center;
-                        pin.VerticalOptions = LayoutOptions.Center;
-                        pin.HeightRequest = 40;
-                        pin.WidthRequest = 40;
-                        pin.CornerRadius = 40;
+                        BoxView pin = new BoxView()
+                        {
+                            Color = pinColours[h],
+                            StyleId = ColourNames[h]+"Pin",
+                            HorizontalOptions = LayoutOptions.Center,
+                            VerticalOptions = LayoutOptions.Center,
+                            HeightRequest = 40,
+                            WidthRequest = 40,
+                            CornerRadius = 40
+                        };
 
                         pin.SetValue(Grid.RowProperty, ro);
                         pin.SetValue(Grid.ColumnProperty, co);
@@ -195,8 +196,10 @@ namespace Mastermind
                     if ((r % 3) > 0)
                     {
                         //Create Image
-                        guessSelect = new Image();
-                        guessSelect.Source = "Images/Empty.png";
+                        guessSelect = new Image()
+                        {
+                            Source = "Images/Empty.png"
+                        };
 
                         //Set Value
                         guessSelect.SetValue(Grid.RowProperty, r);
@@ -208,9 +211,13 @@ namespace Mastermind
 
                         //Create Boxviews for Pins
                         BoxView change;
-                        change = new BoxView();
-                        change.CornerRadius = 100;
-                        change.Scale = .75;
+                        change = new BoxView()
+                        {
+                            HorizontalOptions = LayoutOptions.Center,
+                            VerticalOptions = LayoutOptions.Center,
+                            CornerRadius = 100, Scale = .75
+                        }; 
+
                         GrdCorrectDisplay.Children.Add(change);
                         change.SetValue(Grid.RowProperty, r);
                         change.SetValue(Grid.ColumnProperty, c);
@@ -221,13 +228,16 @@ namespace Mastermind
 
             #region CreateHowToButton
             Button BtnInstructions;
-            BtnInstructions = new Button();
-            BtnInstructions.Text = "Click to Read How To Play";
+            BtnInstructions = new Button()
+            {
+                Text = "Click to Read How To Play",
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center,
+            };
+
             BtnInstructions.SetValue(Grid.RowProperty, 14);
             BtnInstructions.SetValue(Grid.ColumnProperty, 0);
             BtnInstructions.SetValue(Grid.ColumnSpanProperty, 6);
-            BtnInstructions.HorizontalOptions = LayoutOptions.Center;
-            BtnInstructions.VerticalOptions = LayoutOptions.Center;
             BtnInstructions.Clicked += BtnHowTo_Clicked;
             GrdGameLayout.Children.Add(BtnInstructions);
 
@@ -235,52 +245,65 @@ namespace Mastermind
 
             #region CreateCheckButton
             Button btnCheckGuess;
-            btnCheckGuess = new Button();
-            btnCheckGuess.Text = "Check Guess";
+            btnCheckGuess = new Button()
+            {
+                Text = "Check Guess",
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center
+            };
+
             btnCheckGuess.SetValue(Grid.RowProperty, 13);
             btnCheckGuess.SetValue(Grid.ColumnProperty, 4);
             btnCheckGuess.SetValue(Grid.ColumnSpanProperty, 2);
-            btnCheckGuess.HorizontalOptions = LayoutOptions.Center;
-            btnCheckGuess.VerticalOptions = LayoutOptions.Center;
             btnCheckGuess.Clicked += BtnCheckGuess_Clicked;
             GrdGameLayout.Children.Add(btnCheckGuess);
             #endregion
 
             #region CreateNewGameButton
             Button BtnNewGame;
-            BtnNewGame = new Button();
-            BtnNewGame.Text = "New Game";
+            BtnNewGame = new Button()
+            {
+                Text = "New Game",
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center,
+                
+            };
+
             BtnNewGame.SetValue(Grid.RowProperty, 15);
             BtnNewGame.SetValue(Grid.ColumnProperty, 0);
             BtnNewGame.SetValue(Grid.ColumnSpanProperty, 2);
-            BtnNewGame.HorizontalOptions = LayoutOptions.Center;
-            BtnNewGame.VerticalOptions = LayoutOptions.Center;
             BtnNewGame.Clicked += BtnNewGame_Clicked;
             GrdGameLayout.Children.Add(BtnNewGame);
             #endregion
 
             #region CreateSaveButton
             Button BtnSaveGame;
-            BtnSaveGame = new Button();
-            BtnSaveGame.Text = "Save Game";
+            BtnSaveGame = new Button()
+            {
+                Text = "Save Game",
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center
+            };
+
             BtnSaveGame.SetValue(Grid.RowProperty, 15);
             BtnSaveGame.SetValue(Grid.ColumnProperty, 2);
             BtnSaveGame.SetValue(Grid.ColumnSpanProperty, 2);
-            BtnSaveGame.HorizontalOptions = LayoutOptions.Center;
-            BtnSaveGame.VerticalOptions = LayoutOptions.Center;
             BtnSaveGame.Clicked += BtnSaveGame_Clicked;
             GrdGameLayout.Children.Add(BtnSaveGame);
             #endregion
 
             #region CreateLoadButton
             Button BtnLoadGame;
-            BtnLoadGame = new Button();
-            BtnLoadGame.Text = "Load Game";
+            BtnLoadGame = new Button()
+            {
+                Text = "Load Game",
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center
+            };
+
             BtnLoadGame.SetValue(Grid.RowProperty, 15);
             BtnLoadGame.SetValue(Grid.ColumnProperty, 4);
             BtnLoadGame.SetValue(Grid.ColumnSpanProperty, 2);
-            BtnLoadGame.HorizontalOptions = LayoutOptions.Center;
-            BtnLoadGame.VerticalOptions = LayoutOptions.Center;
             BtnLoadGame.Clicked += BtnLoadGame_Clicked;
             GrdGameLayout.Children.Add(BtnLoadGame);
             #endregion
@@ -407,14 +430,16 @@ namespace Mastermind
 
             //New BoxView
             BoxView placePin;
-            placePin = new BoxView();
-            placePin.Color = currPinSelected.Color;
-            placePin.StyleId = "SelectedPin";
-            placePin.HorizontalOptions = LayoutOptions.Center;
-            placePin.VerticalOptions = LayoutOptions.Center;
-            placePin.HeightRequest = currPinSelected.HeightRequest;
-            placePin.WidthRequest = currPinSelected.WidthRequest;
-            placePin.CornerRadius = currPinSelected.CornerRadius;
+            placePin = new BoxView()
+            {
+                Color = currPinSelected.Color,
+                StyleId = "SelectedPin",
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center,
+                HeightRequest = currPinSelected.HeightRequest,
+                WidthRequest = currPinSelected.WidthRequest,
+                CornerRadius = currPinSelected.CornerRadius
+            };
 
             placePin.GestureRecognizers.Add(pinTap);
 
@@ -656,10 +681,6 @@ namespace Mastermind
                     {
                         if (boxRow == destRow && boxCol == destCol)
                         {
-
-                            DisplayAlert("h", "BoxRow:"+boxRow.ToString() + "\tSaved Row:" + destRow.ToString() + "\n" +
-                               "BoxCol:" + boxCol.ToString() + "\tSavedRow:" +destCol.ToString() + "\n" + 
-                               "Colour:" +guess.ToString() +"Colour Array:"+pinColours[0].ToString(), "k");
                             switch (guess)
                             {
                                 case 1:
@@ -709,17 +730,15 @@ namespace Mastermind
 
                             //Set User Guess to Current Row
                             userGuess[destCol] = colour;
-
-                            DisplayAlert("h","UserGuessArray"+ userGuess[destCol].ToString(),"k");
                         }
                     }
                 }
             }
         }
 
-        private void PlaceCorrectPins()
+        private int PlaceCorrectPins()
         {
-            int minRow, maxRow;
+            int minRow, maxRow, win;
 
             switch (currRow)
             {
@@ -770,7 +789,9 @@ namespace Mastermind
                     break;
             }
 
-            PlaceCorrectPins(minRow, maxRow);
+            win = PlaceCorrectPins(minRow, maxRow);
+
+            return win;
         }
 
         private int PlaceCorrectPins(int minRow, int maxRow)
@@ -778,6 +799,11 @@ namespace Mastermind
             //Declare Variables
             int red = 0, white = 0, win = 0;
 
+
+            DisplayAlert("h", colPins[0].ToString() + " " +
+                colPins[1].ToString() + " " +
+                colPins[2].ToString() + " " +
+                colPins[3].ToString(), "k");
             //Count Pins Needed to Display
             for (int chq = 0; chq < 4; chq++)
             {
@@ -847,9 +873,9 @@ namespace Mastermind
             //Check User Guess Against Answer
             else
             {
-                currRow = NUM_ROW - round;
+                FindCurrentRow();
                 pinDisRow = (currRow * 3) - 2;
-                CheckUserGuess(currRow);
+                CheckUserGuess();
 
                 DisplayAnswer();
             }
@@ -886,116 +912,87 @@ namespace Mastermind
         #endregion
 
         #region Play
-        private void CheckUserGuess(int currRow)
+        private void CheckUserGuess()
         {
             //Declare Variables
             //MinRow - start, MaxRow - Finish
-            int minRow, maxRow, win, buffer = 0;
-            int duplicate = 0, found = 1;
+            int win, ansDup = 0, userDup = 0, index;
+            bool redFound, found;
 
-            switch (currRow)
+            FindCurrentRow();
+
+            //Check for Duplicates in Answer Code
+            for (int dup1 = 0; dup1 < 4; dup1++)
             {
-                case 1:
-                    minRow = 1;
-                    maxRow = 3;
-                    break;
-                case 2:
-                    minRow = 4;
-                    maxRow = 6;
-                    break;
-                case 3:
-                    minRow = 7;
-                    maxRow = 9;
-                    break;
-                case 4:
-                    minRow = 10;
-                    maxRow = 12;
-                    break;
-                case 5:
-                    minRow = 13;
-                    maxRow = 15;
-                    break;
-                case 6:
-                    minRow = 16;
-                    maxRow = 18;
-                    break;
-                case 7:
-                    minRow = 19;
-                    maxRow = 21;
-                    break;
-                case 8:
-                    minRow = 22;
-                    maxRow = 24;
-                    break;
-                case 9:
-                    minRow = 25;
-                    maxRow = 27;
-                    break;
-                case 10:
-                    minRow = 28;
-                    maxRow = 30;
-                    break;
-
-                default:
-                    minRow = 0;
-                    maxRow = 0;
-                    break;
-            }
-
-            //Check for Duplcates in Answer Code
-            for(int dup1 = 0; dup1 < 4; dup1++)
-            {
+                found = false;
                 for (int dup2 = 0; dup2 < 4; dup2++)
                 {
-                    if(answerCode[dup1].Equals(userGuess[dup2]) && found > 0)
+                    if(dup1 < dup2 && found == false)
                     {
-                        ++duplicate;
+                        if (answerCode[dup1].Equals(answerCode[dup2]))
+                        {
+                            ++ansDup;
 
-                        found = -1;
+                            found = true;
+                        }
                     }
                 }
-
-                found = 1;
             }
 
-            if(duplicate > 4)
+            //Check for Duplicates in User Code
+            for (int dup1 = 0; dup1 < 4; dup1++)
             {
-                duplicate = (duplicate - 4);
+                found = false;
+                for (int dup2 = 0; dup2 < 4; dup2++)
+                {
+                    if (dup1 < dup2 && found == false)
+                    {
+                        if (userGuess[dup1].Equals(userGuess[dup2]))
+                        {
+                            ++userDup;
+
+                            found = true;
+                        }
+                    }
+                }
             }
 
             for (int check = 0; check < 4; check++)
             {
-                int index = Array.IndexOf(answerCode, userGuess[check]);
+                redFound = false;
 
                 //Correct Colour and Place
                 if (answerCode[check].Equals(userGuess[check]))
                 {
                     colPins[check] = 2;//Red
-
-                    --duplicate;
-                    buffer++;
-                    index = -1;
+                            
+                    redFound = true;
                 }
-
+                    
                 //If User Colour is Correct
-                else
+                if (redFound == false)
                 {
-                    if (index > -1 && duplicate > 0 )
+                    index = Array.IndexOf(answerCode, userGuess[check]);
+                    if (index > -1)
                     {
-                        if(buffer < duplicate)
-                        {
-                            //Correct Colour
-                            colPins[check] = 1;//White
-                        }
+                        //Correct Colour
+                        colPins[check] = 1;//White
                     }
                     else
                     {
                         colPins[check] = 0;//Clear
                     }
                 }
+
+                //Duplicates Get rid
+                if(userDup > ansDup)
+                {
+                    colPins[check] = 0;
+                    userDup--;
+                }
             }
 
-            win = PlaceCorrectPins(minRow, maxRow);
+            win = PlaceCorrectPins();
 
             //Update Round Counter
             UpdateRound();
@@ -1057,6 +1054,7 @@ namespace Mastermind
             {
                 answerCode[index] = randAns.Next(1, 9);
                 userGuess[index] = 0;
+                colPins[index] = 0;
 
                 //Save Answer Code
                 saveData.answerCode[index] = answerCode[index];
@@ -1134,7 +1132,7 @@ namespace Mastermind
                 //Variables
                 round = saveData.round;
                 rnd = saveData.round;
-                int userG = 0, row = 0, rowsUsed = 10;
+                int userG, row, rowsUsed = 10;
                 row = NUM_ROW - rnd;
 
                 //Load Answer Code
@@ -1155,10 +1153,15 @@ namespace Mastermind
                             PlacePins(userG, rowsUsed, j);
                         }
 
+                        CheckUserGuess();
+
                         --rnd;
                         --rowsUsed;
                     }
                 }
+
+                round = saveData.round;
+                DisplayAlert("h", round.ToString(), "k");
 
                 //Reset round Counter
                 FindCurrentRow();
